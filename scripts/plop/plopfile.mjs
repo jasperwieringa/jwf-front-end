@@ -8,7 +8,7 @@ The current actions include:
  - Add import statement to the index.ts file (src/index.ts)
 */
 export default function (plop) {
-  plop.setHelper('tagWithoutPrefix', tag => tag.replace(/^sjc-/, ''));
+  plop.setHelper('tagWithoutPrefix', tag => tag.replace(/^jwf-/, ''));
 
   plop.setHelper('tagToTitle', tag => {
     const withoutPrefix = plop.getHelper('tagWithoutPrefix');
@@ -17,15 +17,15 @@ export default function (plop) {
   });
 
   plop.setGenerator('component', {
-    description: 'Generate a new SJC web-component',
+    description: 'Generate a new JWF web-component',
     prompts: [
       {
         type: 'input',
         name: 'tag',
-        message: 'Tag name? (e.g. sjc-button)',
+        message: 'Tag name? (e.g. jwf-button)',
         validate: value => {
-          // Start with sjc- and include only a-z + dashes
-          if (!/^sjc-[a-z-+]+/.test(value)) {
+          // Start with jwf- and include only a-z + dashes
+          if (!/^jwf-[a-z-+]+/.test(value)) {
             return false;
           }
 
