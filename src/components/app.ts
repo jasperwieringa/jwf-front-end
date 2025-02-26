@@ -7,10 +7,13 @@ import { JwfClient } from '../services/JwfClient.ts';
 import { isDefined } from '../utilities/isDefined.js';
 import { Theme } from '../types/Theme.js';
 import '../assets/translations/translations.js';
-import styles from './index.styles.js';
+import styles from './app.styles.js';
+
+import './common/loader/loader.js';
+import './common/rtt/rtt.js';
 
 @customElement('jwf-app')
-export default class Index extends LitElement {
+export default class App extends LitElement {
   @provide({ context: clientContext })
   client = new JwfClient();
 
@@ -73,16 +76,14 @@ export default class Index extends LitElement {
       >
         <div
           id="pageElements"
-          @jwf-loaded=${this._handleElementLoaded}
           ?hidden=${this._loading}
+          @jwf-loaded=${this._handleElementLoaded}
         >
           <jwf-banner></jwf-banner>
         </div>
         <jwf-loader ?hidden=${!this._loading}></jwf-loader>
-        ${when(
-          isDefined(this._sectionsRef),
-          () => html`
-            <jwf-rtt .target=${this._sectionsRef!}></jwf-rtt>`
+        ${when(isDefined(this._sectionsRef), () => html`
+          <jwf-rtt .target=${this._sectionsRef!}></jwf-rtt>`
         )}
       </main>
     `;
@@ -91,6 +92,6 @@ export default class Index extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'jwf-app': Index;
+    'jwf-app': App;
   }
 }
