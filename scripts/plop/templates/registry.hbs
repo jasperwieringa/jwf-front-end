@@ -1,0 +1,6 @@
+import {{ properCase tag }} from './{{ properCase tag }}.js';
+import { isDefined } from '../../utilities/isDefined.ts';
+
+if (!isDefined(customElements.get('{{ tag }}'))) {
+  customElements.define('{{ tag }}', {{ properCase tag }});
+}

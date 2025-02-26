@@ -1,0 +1,31 @@
+{
+  "name": "jasper-wieringa",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint --ext .ts . --ignore-path .gitignore",
+    "format": "eslint --ext .ts . --fix --ignore-path .gitignore",
+    "create": "plop --plopfile scripts/plop/plopfile.mjs"
+  },
+  "dependencies": {
+    "@lit/context": "^1.1.0",
+    "@sanity/client": "^6.4.0",
+    "@sanity/image-url": "^1.0.2",
+    "@shoelace-style/shoelace": "2.12.0",
+    "lit": "^3.2.1",
+    "i18next": "^23.7.16",
+    "lit-i18n": "^4.1.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "eslint": "^8.56.0",
+    "plop": "^4.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
+  }
+}
