@@ -1,6 +1,6 @@
 import { Image } from "../Image.js";
 
-export type Banner = {
+export type InteractionElement = {
   title: string;
   description: string;
   image: Image;

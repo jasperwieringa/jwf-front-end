@@ -1,8 +1,12 @@
+const POSITION_GROUPS = ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'] as const;
+export type PositionGroup = typeof POSITION_GROUPS[number];
+
 export type Image = {
   alt: string;
   width: number;
   height: number;
-  positionGroup: 'top-left' | 'bottom-left' | 'center' | 'top-right' | 'bottom-right';
+  positionGroup: PositionGroup;
+  gridIndex: number;
   asset: {
     _ref: string;
     _type: string;

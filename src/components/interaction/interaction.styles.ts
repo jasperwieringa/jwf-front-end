@@ -7,8 +7,6 @@ export default [
   css`
     #main {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, auto);
     }
     
     #main div {
@@ -16,9 +14,34 @@ export default [
       justify-content: center;
       align-items: center;
     }
-    
-    .row-span-2 {
-      grid-row: span 2;
+
+    /* Assign specific positions */
+    .top-left {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .top-right {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .center {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bottom-left {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .bottom-right {
+      grid-column: 3;
+      grid-row: 2;
     }
   `
 ]

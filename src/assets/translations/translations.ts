@@ -14,10 +14,7 @@ i18next.use(initLitI18n).init({
           rtt_no_target: 'No container element found!',
         },
         section_errors: {
-          missing_banner: 'You did not create a banner section yet',
-        },
-        api_errors: {
-          fetch_banner: 'We could not retrieve the banner section',
+          missing_interactions: 'You did not create an interactions section yet',
         },
         contact: {
           name: 'Name:',
@@ -39,10 +36,7 @@ i18next.use(initLitI18n).init({
           rtt_no_target: 'Geen container element gevonden!',
         },
         section_errors: {
-          missing_banner: 'Je hebt nog geen banner sectie aangemaakt',
-        },
-        api_errors: {
-          fetch_banner: 'We konden de banner sectie niet ophalen',
+          missing_interactions: 'Je hebt nog geen interactie sectie aangemaakt',
         },
         contact: {
           name: 'Naam:',
