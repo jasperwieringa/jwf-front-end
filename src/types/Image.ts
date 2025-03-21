@@ -1,6 +1,9 @@
 export type Image = {
   alt: string;
-  blur: boolean;
+  width: number;
+  height: number;
+  positionGroup: 'left' | 'right' | 'center';
+  gridIndex: number;
   asset: {
     _ref: string;
     _type: string;

@@ -16,8 +16,10 @@ export default [
     }
 
     #pageElements {
-      height: inherit;
-      overflow-y: auto;
+      height: 100%;
+      overflow: hidden;
+      background-image: url('cover.svg');
+      background-repeat: round;
     }
 
     #pageElements > * {

@@ -41,32 +41,40 @@ export default class JwfInteraction extends LitElement {
   }
 
   private _renderBanner(item: Banner, index: number) {
-    const { image, alt } = item;
+    const { image } = item;
 
     return html`
       <jwf-image
         id="banner_${index}"
         src=${this.client.urlForImage(image).url()}
-        alt=${ifDefined(alt || undefined)}
-        width="100"
-        height="100"
+        alt=${ifDefined(image.alt || undefined)}
+        width=${image.width ?? 'auto'}
+        height=${image.height ?? 'auto'}
       ></jwf-image>
     `;
   }
 
+  private _renderError() {
+    return html`
+      <div class="page--no-upload">
+        <sl-alert variant="primary" open>
+          <sl-icon slot="icon" name="info-circle"></sl-icon>
+          <strong>${t('general.error')}</strong><br />
+          ${t('section_errors.missing_banner')}
+        </sl-alert>
+      </div>
+    `;
+  }
+
   protected render() {
-    return when(hasItems(this._bannerElements),
-      () => repeat(this._bannerElements, (item, index) => this._renderBanner(item, index)),
-      () => html`
-        <div class="page--no-upload">
-          <sl-alert variant="primary" open>
-            <sl-icon slot="icon" name="info-circle"></sl-icon>
-            <strong>${t('general.error')}</strong><br />
-            ${t('section_errors.missing_banner')}
-          </sl-alert>
-        </div>
-      `
-    );
+    return html`
+      <div id="main">
+        ${when(hasItems(this._bannerElements),
+          () => repeat(this._bannerElements!, (item, index) => this._renderBanner(item, index)),
+          () => this._renderError()
+        )}  
+      </div>
+    `;
   }
 }
 
