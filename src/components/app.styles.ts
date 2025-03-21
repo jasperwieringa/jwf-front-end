@@ -13,13 +13,16 @@ export default [
       height: 100svh;
       color: var(--sl-color-neutral-900);
       background-color: var(--jwf-color-background);
-
-      backdrop-filter: blur(5px) saturate(50%);
     }
 
     #pageElements {
       height: inherit;
       overflow-y: auto;
+    }
+
+    #pageElements > * {
+      height: 100svh;
+      display: grid;
     }
 
     jwf-rtt {

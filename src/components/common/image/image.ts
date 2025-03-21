@@ -53,7 +53,7 @@ export default class Image extends LitElement {
   private _intersectionObserver?: IntersectionObserver;
 
   /** @internal - Options that define certain aspects of the observer’s behavior. */
-  private _observerOptions: IntersectionObserverInit = {
+  private _observerOptions: any = {
     root: null,
     rootMargin: '0px',
     threshold: [0, 1],
@@ -159,7 +159,14 @@ export default class Image extends LitElement {
         style=${styleMap(imageStyles)}
       >
         <img id="image" src="" alt=${this.alt ?? ''} />
-        <jwf-loader id="loader"></jwf-loader>
+        <div id="loader">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
     `;
   }
