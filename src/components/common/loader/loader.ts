@@ -1,6 +1,5 @@
 import { html, LitElement } from "lit";
 import { customElement } from 'lit/decorators.js';
-import { translate as t } from 'lit-i18n';
 import styles from "./loader.styles.js";
 
 @customElement('jwf-loader')
@@ -10,12 +9,16 @@ export default class Loader extends LitElement {
   protected render() {
     return html`
       <div id="main">
-        <div class="container">
-          <div class="loader--device"></div>
-          <div class="loader--device"></div>
-          <div class="loader--device"></div>
+        <div class="loader">
+          <p>loading</p>
+          <div class="words">
+            <span class="word">buttons</span>
+            <span class="word">forms</span>
+            <span class="word">switches</span>
+            <span class="word">cards</span>
+            <span class="word">buttons</span>
+          </div>
         </div>
-        <div class="text"></div>
       </div>
     `;
   }

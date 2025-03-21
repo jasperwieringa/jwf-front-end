@@ -5,7 +5,7 @@ export default css`
   :host {
     position: relative;
     box-sizing: border-box;
-    font-family: 'Signika', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: var(--sl-font-weight-normal);
     font-size: var(--sl-font-size-medium);
     line-height: var(--sl-line-height-normal);

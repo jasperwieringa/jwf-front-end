@@ -6,6 +6,9 @@ export default css`
   .sl-theme-light {
     color-scheme: light;
 
+    --jwf-color-primary: rgb(244, 157, 55);
+    --jwf-color-background: var(--sl-color-neutral-0);
+
     --sl-color-gray-50: hsl(0 0% 97.5%);
     --sl-color-gray-100: hsl(240 4.8% 95.9%);
     --sl-color-gray-200: hsl(240 5.9% 90%);

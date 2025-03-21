@@ -20,13 +20,13 @@ export default [
       overflow-y: scroll;
     }
 
-    sjc-rtt {
+    jwf-rtt {
       display: none
     }
 
     /* Small devices and up */
     @media (min-width: ${mobileBreakpoint}rem) {
-      sjc-rtt {
+      jwf-rtt {
         display: unset;
       }
     }

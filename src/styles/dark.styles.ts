@@ -5,6 +5,9 @@ export default css`
   .sl-theme-dark {
     color-scheme: dark;
 
+    --jwf-color-primary: rgb(244, 157, 55);
+    --jwf-color-background: rgb(67, 66, 66);
+
     --sl-color-gray-50: hsl(240 5.1% 15%);
     --sl-color-gray-100: hsl(240 5.7% 18.2%);
     --sl-color-gray-200: hsl(240 4.6% 22%);

@@ -11,140 +11,65 @@ export default [
       height: 100%;
     }
     
-    .loader--device {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      z-index: 10;
-      width: 160px;
-      height: 100px;
-      margin-left: -80px;
-      margin-top: -50px;
-      border-radius: 5px;
-      background: #1e3f57;
-      animation: screen1 3s cubic-bezier(0.55,0.3,0.24,0.99) infinite;
-    }
-
-    .loader--device:nth-child(2) {
-      z-index: 11;
-      width: 150px;
-      height: 90px;
-      margin-top: -45px;
-      margin-left: -75px;
-      border-radius: 3px;
-      background: #3c517d;
-      animation-name: screen2;
-    }
-
-    .loader--device:nth-child(3) {
-      z-index: 12;
-      width: 40px;
-      height: 20px;
-      margin-top: 50px;
-      margin-left: -20px;
-      border-radius: 0 0 5px 5px;
-      background: #6bb2cd;
-      animation-name: screen3;
-    }
-
-    .text {
-      margin-top: 200px;
-      font-family: var(--sl-input-font-family);
-      font-size: var(--sl-font-size-large);
-    }
-
-    .text::before {
-      content: "Getting things ready";
-      animation: text 2s 0s infinite;
-    }
-
-    @keyframes screen1 {
-      3%,97% {
-        width: 160px;
-        height: 100px;
-        margin-top: -50px;
-        margin-left: -80px;
+    .loader {
+      display: flex;
+      gap: var(--sl-spacing-small);
+      font-size: 25px;
+      height: 40px;
+      overflow: hidden;
+      
+      p {
+        margin: 0;
       }
 
-      30%,36% {
-        width: 80px;
-        height: 120px;
-        margin-top: -60px;
-        margin-left: -40px;
-      }
-
-      63%,69% {
-        width: 40px;
-        height: 80px;
-        margin-top: -40px;
-        margin-left: -20px;
+      .word {
+        display: block;
+        color: var(--jwf-color-primary);
+        animation: spin_jwf 4s infinite;
       }
     }
-
-    @keyframes screen2 {
-      3%,97% {
-        height: 90px;
-        width: 150px;
-        margin-left: -75px;
-        margin-top: -45px;
+    
+    @keyframes spin_jwf {
+      10% {
+        -webkit-transform: translateY(-102%);
+        transform: translateY(-102%);
       }
 
-      30%,36% {
-        width: 70px;
-        height: 96px;
-        margin-left: -35px;
-        margin-top: -48px;
+      25% {
+        -webkit-transform: translateY(-100%);
+        transform: translateY(-100%);
       }
 
-      63%,69% {
-        width: 32px;
-        height: 60px;
-        margin-left: -16px;
-        margin-top: -30px;
-      }
-    }
-
-    @keyframes screen3 {
-      3%,97% {
-        height: 20px;
-        width: 40px;
-        margin-left: -20px;
-        margin-top: 50px;
+      35% {
+        -webkit-transform: translateY(-202%);
+        transform: translateY(-202%);
       }
 
-      30%,36% {
-        width: 8px;
-        height: 8px;
-        margin-left: -5px;
-        margin-top: 49px;
-        border-radius: 8px;
-      }
-
-      63%,69% {
-        width: 16px;
-        height: 4px;
-        margin-left: -8px;
-        margin-top: -37px;
-        border-radius: 10px;
-      }
-    }
-
-    @keyframes text {
-      0% {
-        content: "Getting things ready";
-      }
-
-      30% {
-        content: "Getting things ready.";
+      50% {
+        -webkit-transform: translateY(-200%);
+        transform: translateY(-200%);
       }
 
       60% {
-        content: "Getting things ready..";
+        -webkit-transform: translateY(-302%);
+        transform: translateY(-302%);
+      }
+
+      75% {
+        -webkit-transform: translateY(-300%);
+        transform: translateY(-300%);
+      }
+
+      85% {
+        -webkit-transform: translateY(-402%);
+        transform: translateY(-402%);
       }
 
       100% {
-        content: "Getting things ready...";
+        -webkit-transform: translateY(-400%);
+        transform: translateY(-400%);
       }
     }
+
   `,
 ];
