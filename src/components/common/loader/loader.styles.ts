@@ -13,9 +13,9 @@ export default [
     
     .loader {
       display: flex;
-      gap: var(--sl-spacing-small);
-      font-size: 25px;
-      height: 40px;
+      gap: var(--sl-spacing-x-small);
+      font-size: 4vh;
+      height: 6vh;
       overflow: hidden;
       
       p {

@@ -1,5 +1,5 @@
 import { ClientConfig, createClient, SanityClient } from '@sanity/client';
-import * as imageUrlBuilder from '@sanity/image-url';
+import imageUrlBuilder from '@sanity/image-url';
 import { Image } from '../types/Image';
 import { QueryParams } from "@sanity/client";
 
@@ -12,14 +12,14 @@ export class JwfClient {
   }
 
   // Initialize Sanity client
-  async init() {
+  init() {
     const config = this.loadConfig();
     this.client = createClient(config);
   }
 
   loadConfig(): ClientConfig {
     return {
-      projectId: 'yixpgvrk',
+      projectId: 'y7pxlyx6',
       dataset: 'production',
       useCdn: true,
       apiVersion: '2023-05-03',

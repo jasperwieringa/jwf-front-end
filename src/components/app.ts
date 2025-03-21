@@ -1,14 +1,17 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
+import { until } from 'lit/directives/until.js';
 import { provide } from '@lit/context';
 import { clientContext } from '../services/client-context.js';
 import { JwfClient } from '../services/JwfClient.ts';
+import { API_QUERIES } from '../services/apiQueries.ts';
 import { isDefined } from '../utilities/isDefined.js';
 import { Theme } from '../types/Theme.js';
 import '../assets/translations/translations.js';
 import styles from './app.styles.js';
 
+import './common/image/image.js';
 import './common/loader/loader.js';
 import './common/rtt/rtt.js';
 
@@ -21,7 +24,10 @@ export default class App extends LitElement {
   theme: Theme = 'dark';
 
   @state()
-  private _loading: boolean = true;
+  private _loading: boolean = false;
+
+  @state()
+  private _background = this._fetchBackGroundImage();
 
   @query('#pageElements')
   _sectionsRef?: HTMLElement;
@@ -31,7 +37,7 @@ export default class App extends LitElement {
 
   static styles = styles;
 
-  connectedCallback(): void {
+  connectedCallback() {
     super.connectedCallback();
     document.addEventListener('keydown', this._handleKeyDown);
   }
@@ -48,6 +54,20 @@ export default class App extends LitElement {
     }
   }
 
+  /** Method that renders the background image */
+  private async _fetchBackGroundImage() {
+    const banners = await this.client.query(API_QUERIES.banner);
+    const { image, alt } = banners[0];
+    return html`
+      <jwf-image
+        src=${this.client.urlForImage(image).url()}
+        alt=${alt}
+        width="100%"
+        height="100%"
+      ></jwf-image>
+    `
+  }
+
   // Used to store each loaded page element in the _loadedPageElements Map object
   private _handleElementLoaded(event: CustomEvent) {
     const tagName = (event.target as HTMLElement).tagName.toLowerCase();
@@ -61,9 +81,30 @@ export default class App extends LitElement {
 
   // Are all page elements loaded?
   private _allElementsLoaded() {
-    const bannerReady = this._loadedPageElements.has('jwf-banner');
     // const contactReady = this._loadedPageElements.has('jwf-contact');
-    return bannerReady;
+    return true;
+  }
+
+  /** Method that renders all page elements */
+  private _renderPageElements() {
+    return html`
+      <div id="pageElements" ?hidden=${this._loading} @jwf-loaded=${this._handleElementLoaded}>
+        ${until(this._background, '')}
+        <!-- Elements here -->
+      </div>
+    `
+  }
+
+  /** Method that renders a JWF loader */
+  private _renderLoader() {
+    return html`<jwf-loader></jwf-loader>`;
+  }
+
+  /** Method that renders a return to top button */
+  private _renderReturnToTop() {
+    return html`
+      <jwf-rtt .target=${this._sectionsRef!}></jwf-rtt>
+    `;
   }
 
   protected render() {
@@ -74,17 +115,9 @@ export default class App extends LitElement {
         role="main"
         @keydown=${this._handleKeyDown}
       >
-        <div
-          id="pageElements"
-          ?hidden=${this._loading}
-          @jwf-loaded=${this._handleElementLoaded}
-        >
-          <jwf-banner></jwf-banner>
-        </div>
-        <jwf-loader ?hidden=${!this._loading}></jwf-loader>
-        ${when(isDefined(this._sectionsRef), () => html`
-          <jwf-rtt .target=${this._sectionsRef!}></jwf-rtt>`
-        )}
+        ${this._renderPageElements()}
+        ${when(this._loading, () => this._renderLoader())}
+        ${when(isDefined(this._sectionsRef), () => this._renderReturnToTop())}
       </main>
     `;
   }

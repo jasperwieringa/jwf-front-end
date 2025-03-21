@@ -12,12 +12,14 @@ export default [
     #main {
       height: 100svh;
       color: var(--sl-color-neutral-900);
-      background-color: var(--sl-color-neutral-0);
+      background-color: var(--jwf-color-background);
+
+      backdrop-filter: blur(5px) saturate(50%);
     }
 
     #pageElements {
       height: inherit;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
 
     jwf-rtt {

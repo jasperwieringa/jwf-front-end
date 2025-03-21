@@ -6,7 +6,7 @@ export default css`
     color-scheme: dark;
 
     --jwf-color-primary: rgb(244, 157, 55);
-    --jwf-color-background: rgb(67, 66, 66);
+    --jwf-color-background: rgb(46, 51, 57);
 
     --sl-color-gray-50: hsl(240 5.1% 15%);
     --sl-color-gray-100: hsl(240 5.7% 18.2%);
