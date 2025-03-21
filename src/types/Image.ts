@@ -2,8 +2,7 @@ export type Image = {
   alt: string;
   width: number;
   height: number;
-  positionGroup: 'left' | 'right' | 'center';
-  gridIndex: number;
+  positionGroup: 'top-left' | 'bottom-left' | 'center' | 'top-right' | 'bottom-right';
   asset: {
     _ref: string;
     _type: string;

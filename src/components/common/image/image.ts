@@ -3,8 +3,10 @@ import { customElement, property, state, query } from 'lit/decorators.js';
 import { emit } from '../../../utilities/event.js';
 import { watch } from '../../../utilities/watch.js';
 import { JWF_EVENTS } from '../../../utilities/constants/events.js';
-import { getAnimation, parseDuration, startAnimations, stopAnimations } from '../../../utilities/animate.js';
+import { parseDuration } from '../../../utilities/animate.js';
 import styles from './image.styles.js';
+
+import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 
 /**
  * @event jwf-image-loaded - Emitted when the image is loaded.
@@ -43,10 +45,6 @@ export default class Image extends LitElement {
   @query('#image')
   private image!: HTMLImageElement;
 
-  /** @internal */
-  @query('#loader')
-  private loader!: HTMLElement;
-
   /** @internal - Reference to the intersection observer. */
   private _intersectionObserver?: IntersectionObserver;
 
@@ -60,10 +58,6 @@ export default class Image extends LitElement {
   /** @internal - Used to set a timeout on loading the image. */
   private _loadTimer: number | null = null;
 
-  /** @internal - Loading state of the image. */
-  @state()
-  private _loading: boolean = false;
-
   /** @internal - Is a valid image loaded?. */
   @state()
   private _hasImage: boolean = false;
@@ -71,17 +65,6 @@ export default class Image extends LitElement {
   @watch('src', { waitUntilFirstUpdate: true })
   handleSrcChange() {
     this._attachObserver();
-  }
-
-  @watch('_loading', { waitUntilFirstUpdate: true })
-  async handleLoadingChange() {
-    if (this._loading) {
-      await stopAnimations(this.loader);
-      const { keyframes, options } = getAnimation(this.loader, 'loader.show');
-      await startAnimations(this.loader, keyframes, options);
-    } else {
-      await stopAnimations(this.loader);
-    }
   }
 
   static styles = styles;
@@ -117,7 +100,6 @@ export default class Image extends LitElement {
 
   // Load the image and handle the response
   private _loadImage() {
-    this._loading = true;
     this.image.src = this.src!;
     this.image.onload = this._imageResponse.bind(this);
     this.image.onerror = this._imageResponse.bind(this);
@@ -125,7 +107,6 @@ export default class Image extends LitElement {
 
   // Emit the response from the image
   private _imageResponse(e: any) {
-    this._loading = false;
     this._hasImage = e.type === 'load';
     this._removeObserver();
 
@@ -147,14 +128,7 @@ export default class Image extends LitElement {
           width=${this.width ?? 'auto'}
           src=""
           alt=${this.alt ?? ''} />
-        <div id="loader">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
+        <sl-spinner id="loader"></sl-spinner>
       </div>
     `;
   }
