@@ -4,28 +4,23 @@ import componentStyles from '../../../styles/component.styles.js';
 export default [
   componentStyles,
   css`
-    :host,
-    #main {
+    :host {
       display: inline-flex;
       justify-content: center;
-      align-items: center;
     }
     
     img {
       display: none;
     }
 
-    .image--has-image img {
-      width: 100%;
-      height: 100%;
+    :host([has-image]) img {
       display: block;
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
-      object-fit: cover;
     }
 
-    .image--has-image #loader {
+    :host([has-image]) #loader {
       display: none;
     }
 

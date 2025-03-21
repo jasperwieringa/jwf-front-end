@@ -1,7 +1,5 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
-import { styleMap } from 'lit/directives/style-map.js';
 import { emit } from '../../../utilities/event.js';
 import { watch } from '../../../utilities/watch.js';
 import { JWF_EVENTS } from '../../../utilities/constants/events.js';
@@ -136,29 +134,19 @@ export default class Image extends LitElement {
     });
   }
 
-  handleSize(size: string) {
-    if (size.endsWith('px') || size.endsWith('%')) {
-      return size;
-    }
-    return `${size}px`;
-  }
-
   protected render() {
-    const imageStyles = {
-      width: this.width ? this.handleSize(this.width) : undefined,
-      height: this.height ? this.handleSize(this.height) : undefined,
-    };
+    if (this._hasImage) {
+      this.setAttribute('has-image', '');
+    }
 
     return html`
-      <div
-        id="main"
-        class=${classMap({
-          image: true,
-          'image--has-image': this._hasImage,
-        })}
-        style=${styleMap(imageStyles)}
-      >
-        <img id="image" src="" alt=${this.alt ?? ''} />
+      <div id="main">
+        <img 
+          id="image" 
+          height=${this.height ?? 'auto'} 
+          width=${this.width ?? 'auto'}
+          src=""
+          alt=${this.alt ?? ''} />
         <div id="loader">
           <div></div>
           <div></div>

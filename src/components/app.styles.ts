@@ -21,7 +21,7 @@ export default [
     }
 
     #pageElements > * {
-      height: 100svh;
+      height: 100%;
       display: grid;
     }
 

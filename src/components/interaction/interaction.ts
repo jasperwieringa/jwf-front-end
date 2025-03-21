@@ -48,6 +48,7 @@ export default class JwfInteraction extends LitElement {
         id="banner_${index}"
         src=${this.client.urlForImage(image).url()}
         alt=${ifDefined(alt || undefined)}
+        width="100"
         height="100"
       ></jwf-image>
     `;
