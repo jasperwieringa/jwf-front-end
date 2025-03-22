@@ -3,8 +3,6 @@ export type PositionGroup = typeof POSITION_GROUPS[number];
 
 export type Image = {
   alt: string;
-  width: number;
-  height: number;
   positionGroup: PositionGroup;
   gridIndex: number;
   rowIndex: number;

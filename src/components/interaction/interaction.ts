@@ -55,10 +55,14 @@ export default class JwfInteraction extends LitElement {
     this._interactionsByPosition = grouped;
   }
 
+  private _logItem(item: InteractionElement) {
+    window.alert(`${item.title}: ${item.description}`);
+  }
+
   /** Method that renders the element to interact with. */
   private _renderInteractionElement(item: InteractionElement) {
     const { image, _id } = item;
-    const { width, height, alt, gridIndex, rowIndex } = image;
+    const { alt, gridIndex, rowIndex } = image;
 
     return html`
       <jwf-image
@@ -66,12 +70,11 @@ export default class JwfInteraction extends LitElement {
         tabindex="0"
         src=${this.client.urlForImage(image).url()}
         alt=${ifDefined(alt || undefined)}
-        width=${width ?? 'auto'}
-        height=${height ?? 'auto'}
         style=${styleMap({
-          'grid-column': gridIndex,
-          'grid-row': rowIndex,
+          'grid-column': gridIndex !== 0 ? gridIndex : undefined,
+          'grid-row': rowIndex !== 0 ? rowIndex : undefined,
         })}
+        @click=${() => this._logItem(item)}
       ></jwf-image>
     `;
   }

@@ -16,6 +16,12 @@ export default [
       justify-content: center;
       align-items: center;
     }
+    
+    jwf-image {
+      height: fit-content;
+      width: fit-content;
+      cursor: pointer;
+    }
 
     /* Assign specific positions */
     .top-left {
@@ -43,9 +49,9 @@ export default [
       grid-row: 2;
       
       .wrapper {
+        display: grid;
         height: 100%;
         width: 100%;
-        display: grid;
       }
     }
   `
