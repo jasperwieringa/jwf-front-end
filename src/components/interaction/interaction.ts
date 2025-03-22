@@ -43,7 +43,7 @@ export default class JwfInteraction extends LitElement {
   }
 
   /** Method that groups interactions by their provided positionGroup. */
-  private _groupInteractions(interactions) {
+  private _groupInteractions(interactions: InteractionElement[]) {
     const grouped = new Map<PositionGroup, InteractionElement[]>();
     interactions.forEach((element: InteractionElement) => {
       const position = element.image.positionGroup;
@@ -84,7 +84,7 @@ export default class JwfInteraction extends LitElement {
     return html`
       <div id="main">
         ${repeat([...this._interactionsByPosition.keys()], (key) => {
-          const elements = repeat(this._interactionsByPosition.get(key), (item) => this._renderInteractionElement(item));
+          const elements = repeat(this._interactionsByPosition.get(key)!, (item) => this._renderInteractionElement(item));
           
           return html`
             <div class=${key}>
