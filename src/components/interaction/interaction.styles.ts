@@ -7,9 +7,11 @@ export default [
   css`
     #main {
       display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, auto);
     }
     
-    #main div {
+    #main > div {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -29,9 +31,6 @@ export default [
     .center {
       grid-column: 2;
       grid-row: 1 / span 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .bottom-left {
@@ -42,6 +41,12 @@ export default [
     .bottom-right {
       grid-column: 3;
       grid-row: 2;
+      
+      .wrapper {
+        height: 100%;
+        width: 100%;
+        display: grid;
+      }
     }
   `
 ]

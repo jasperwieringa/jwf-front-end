@@ -7,6 +7,7 @@ export type Image = {
   height: number;
   positionGroup: PositionGroup;
   gridIndex: number;
+  rowIndex: number;
   asset: {
     _ref: string;
     _type: string;

@@ -2,6 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { translate as t } from 'lit-i18n';
 import { consume } from '@lit/context';
@@ -12,6 +13,7 @@ import {
 import { emit } from '../../utilities/event.js';
 import { JWF_EVENTS } from '../../utilities/constants/events.js';
 import { InteractionElement } from '../../types/pages/InteractionElement.js';
+import { PositionGroup } from '../../types/Image.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
 import styles from './interaction.styles.js';
 
@@ -29,7 +31,7 @@ export default class JwfInteraction extends LitElement {
   public client!: JwfClient;
 
   @state()
-  private _interactionsByPosition: Map<string, InteractionElement[]> = new Map();
+  private _interactionsByPosition: Map<PositionGroup, InteractionElement[]> = new Map();
 
   static styles = styles;
 
@@ -42,7 +44,7 @@ export default class JwfInteraction extends LitElement {
 
   /** Method that groups interactions by their provided positionGroup. */
   private _groupInteractions(interactions) {
-    const grouped = new Map<string, InteractionElement[]>();
+    const grouped = new Map<PositionGroup, InteractionElement[]>();
     interactions.forEach((element: InteractionElement) => {
       const position = element.image.positionGroup;
       if (!grouped.has(position)) {
@@ -56,7 +58,7 @@ export default class JwfInteraction extends LitElement {
   /** Method that renders the element to interact with. */
   private _renderInteractionElement(item: InteractionElement) {
     const { image, _id } = item;
-    const { width, height, alt } = image;
+    const { width, height, alt, gridIndex, rowIndex } = image;
 
     return html`
       <jwf-image
@@ -66,6 +68,10 @@ export default class JwfInteraction extends LitElement {
         alt=${ifDefined(alt || undefined)}
         width=${width ?? 'auto'}
         height=${height ?? 'auto'}
+        style=${styleMap({
+          'grid-column': gridIndex,
+          'grid-row': rowIndex,
+        })}
       ></jwf-image>
     `;
   }
@@ -74,11 +80,17 @@ export default class JwfInteraction extends LitElement {
   private _renderGridElements() {
     return html`
       <div id="main">
-        ${repeat([...this._interactionsByPosition.keys()], (key) => html`
-          <div class=${key}>
-            ${repeat(this._interactionsByPosition.get(key), (item) => this._renderInteractionElement(item))}
-          </div>
-        `)}
+        ${repeat([...this._interactionsByPosition.keys()], (key) => {
+          const elements = repeat(this._interactionsByPosition.get(key), (item) => this._renderInteractionElement(item));
+          
+          return html`
+            <div class=${key}>
+              ${when(key === 'bottom-right', () => html`
+                <div class="wrapper">${elements}</div>
+              `, () => html`${elements}`)}
+            </div>
+          `
+        })}
       </div>
     `;
   }
