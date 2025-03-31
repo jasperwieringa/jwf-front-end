@@ -9,7 +9,7 @@ import { Theme } from '../types/Theme.js';
 import '../assets/translations/translations.js';
 import styles from './app.styles.js';
 
-import './common/canvas/interactive-image.js';
+import './interaction/interaction.js';
 import './common/loader/loader.js';
 import './common/rtt/rtt.js';
 
@@ -62,14 +62,14 @@ export default class App extends LitElement {
 
   // Are all page elements loaded?
   private _allElementsLoaded() {
-    return this._loadedPageElements.has('jwf-interactive-image');
+    return this._loadedPageElements.has('jwf-interaction');
   }
 
   /** Method that renders all page elements */
   private _renderPageElements() {
     return html`
       <div id="pageElements" ?hidden=${this._loading} @jwf-loaded=${this._handleElementLoaded}>
-        <jwf-interactive-image></jwf-interactive-image>
+        <jwf-interaction></jwf-interaction>
       </div>
     `
   }
