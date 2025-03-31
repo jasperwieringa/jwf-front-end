@@ -1,58 +1,15 @@
 import { css } from 'lit';
 import componentStyles from '../../styles/component.styles.js';
-// import { mobileBreakpoint, tabletBreakpoint } from '../../styles/constants/constants.js';
 
 export default [
   componentStyles,
   css`
     #main {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, auto);
-    }
-    
-    #main > div {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    jwf-image {
-      height: fit-content;
-      width: fit-content;
-      cursor: pointer;
-    }
-
-    /* Assign specific positions */
-    .top-left {
-      grid-column: 1;
-      grid-row: 1;
-    }
-
-    .top-right {
-      grid-column: 3;
-      grid-row: 1;
-    }
-
-    .center {
-      grid-column: 2;
-      grid-row: 1 / span 2;
-    }
-
-    .bottom-left {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
-    .bottom-right {
-      grid-column: 3;
-      grid-row: 2;
-      
-      .wrapper {
-        display: grid;
-        height: 100%;
-        width: 100%;
-      }
+      position:absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
     }
   `
 ]

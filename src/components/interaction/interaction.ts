@@ -11,13 +11,14 @@ import { emit } from '../../utilities/event.js';
 import { JWF_EVENTS } from '../../utilities/constants/events.js';
 import { watch } from '../../utilities/watch.ts';
 import { hasItems } from '../../utilities/hasItems.ts';
+import { isDefined } from '../../utilities/isDefined.ts';
 import { InteractionElement } from '../../types/pages/InteractionElement.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
 import styles from './interaction.styles.js';
 
 import '@shoelace-style/shoelace/dist/components/alert/alert.js';
 import '@shoelace-style/shoelace/dist/components/icon/icon.js';
-import { isDefined } from '../../utilities/isDefined.ts';
+import { Particle } from './Particle/Particle.js';
 
 /**
  * @event jwf-loaded - An event fired when the component is done loading.
@@ -27,7 +28,7 @@ export default class JwfInteraction extends LitElement {
   private readonly resizeHandler = this.setCanvasSizeAndDraw.bind(this);
 
   /** @internal - Stores the fetched images to prevent excessively fetching images. */
-  private storedImages = new Map<string, HTMLImageElement>();
+  private storedParticles = new Map<string, Particle>();
 
   @consume({ context: clientContext })
   @property({ attribute: false })
@@ -86,24 +87,18 @@ export default class JwfInteraction extends LitElement {
     // Clear old images on resize
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    // Iterate through the fetched images
     this._interactionElements.forEach(item => {
       const { image, _id } = item;
-      let svgImage = this.storedImages.get(_id);
+      const storedParticle = this.storedParticles.get(_id);
 
-      // If the image wasn't loaded yet, load (and store) it
-      if (!isDefined(svgImage)) {
-        svgImage = new Image();
-        svgImage.src = this.client.urlForImage(image).url();
-        this.storedImages.set(_id, svgImage);
-
-        svgImage.onload = () => {
-          this.drawInteractionElements();
-        };
+      // If the particle does not exist yet, create it
+      if (!isDefined(storedParticle)) {
+        this.storedParticles.set(_id, new Particle(ctx, this.client.urlForImage(image).url()));
+        return;
       }
-
-      if (svgImage.complete) {
-        ctx.drawImage(svgImage, 100, 100);
-      }
+      // If the particle does exist, re-draw it
+      storedParticle.draw();
     })
   }
 
