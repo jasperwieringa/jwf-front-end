@@ -62,7 +62,7 @@ export default class App extends LitElement {
 
   // Are all page elements loaded?
   private _allElementsLoaded() {
-    return this._loadedPageElements.has('jwf-interaction');
+    return this._loadedPageElements.size === this._sectionsRef!.children.length;
   }
 
   /** Method that renders all page elements */
