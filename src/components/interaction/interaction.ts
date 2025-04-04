@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
+
 import { translate as t } from 'lit-i18n';
 import { consume } from '@lit/context';
 import {
@@ -17,6 +18,9 @@ import { API_QUERIES } from '../../services/apiQueries.js';
 import styles from './interaction.styles.js';
 
 import '@shoelace-style/shoelace/dist/components/alert/alert.js';
+import '@shoelace-style/shoelace/dist/components/button/button.js';
+import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
+import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
 import '@shoelace-style/shoelace/dist/components/icon/icon.js';
 import { Particle } from './Particle/Particle.js';
 
@@ -43,6 +47,12 @@ export default class JwfInteraction extends LitElement {
   @query('#main')
   private canvas!: HTMLCanvasElement;
 
+  @query('#dialog')
+  private dialog!: SlDialog;
+
+  @query('#dialog-body')
+  private body!: HTMLDivElement;
+
   @watch('interactionsByPosition', { waitUntilFirstUpdate: true })
   async handleInteractionsByPositionChange() {
     if (this.groupInteractions.length === 0) return;
@@ -65,6 +75,20 @@ export default class JwfInteraction extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('resize', this.resizeHandler);
+  }
+
+  /** Method that updates the dialog information. */
+  private setDialogInformation(title: string, description: string): void {
+    this.dialog.label = title;
+    this.body.textContent = description;
+    this.dialog.show();
+  }
+
+  /** Clear and hide the dialog. */
+  private clearDialog() {
+    this.dialog.label = '';
+    this.dialog.open = false;
+    this.body.textContent = '';
   }
 
   /** Method that groups interactions by their provided positionGroup. */
@@ -108,15 +132,15 @@ export default class JwfInteraction extends LitElement {
     // Loop through all positions (top-left, top-right etc.)
     [...this.interactionsByPosition.keys()].forEach(key => {
       // Loop through each item in a specific position group
-      [...this.interactionsByPosition.get(key)!].forEach((item) => {
-        const { image, _id } = item;
+      [...this.interactionsByPosition.get(key)!].forEach((interactionElement) => {
+        const { image, _id } = interactionElement;
         const storedParticle = this.storedParticles.get(_id);
 
         // If the particle does not exist yet, create it
         if (!isDefined(storedParticle)) {
           this.storedParticles.set(_id, new Particle(
             ctx,
-            image,
+            interactionElement,
             this.client.urlForImage(image).url()
           ));
           return;
@@ -125,17 +149,39 @@ export default class JwfInteraction extends LitElement {
         // If the particle does exist, re-draw it
         if (this.imageCanFitInCanvas(image)) {
           storedParticle.draw();
+        } else {
+          storedParticle.drawn = false;
         }
       });
     })
   }
 
-  /** Handle the mouse movement on the Canvas. */
-  private handleMouseMove(event: MouseEvent) {
-    // Get the boundary of the canvas
+  /** Get the X and Y of the mouse click. */
+  private getMousePosition(event: MouseEvent) {
     const rect = this.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
+    return { x, y };
+  }
+
+  /** Handle the mouse click on the Canvas. */
+  private handleMouseClick(event: MouseEvent) {
+    const { x, y } = this.getMousePosition(event);
+
+    // Iterate through all particles and see which particle exists on the click
+    for (const particle of this.storedParticles.values()) {
+      const { title, description } = particle.interactionElement;
+      const isClicked = particle.isPointInside(x, y);
+
+      if (isClicked && particle.drawn) {
+        this.setDialogInformation(title, description);
+      }
+    }
+  }
+
+  /** Handle the mouse movement on the Canvas. */
+  private handleMouseMove(event: MouseEvent) {
+    const { x, y } = this.getMousePosition(event);
 
     let needsRedraw = false;
 
@@ -143,7 +189,7 @@ export default class JwfInteraction extends LitElement {
     for (const particle of this.storedParticles.values()) {
       const isHovering = particle.isPointInside(x, y);
       if (particle.hovered !== isHovering) {
-        particle.setHovered(isHovering);
+        particle.hovered = isHovering;
         needsRedraw = true;
       }
     }
@@ -161,9 +207,23 @@ export default class JwfInteraction extends LitElement {
         id="main" 
         width=${window.innerWidth} 
         height=${window.innerHeight}
+        @click=${this.handleMouseClick}
         @mousemove=${this.handleMouseMove}
       ></canvas>
     `;
+  }
+
+  /** Draw a shoelace Dialog that displays Particle information. */
+  private renderDialog() {
+    return html`
+      <sl-dialog 
+        id="dialog" 
+        @sl-hide=${this.clearDialog}
+      >
+        <div id="dialog-body"></div>
+        <sl-button slot="footer" variant="primary" @click=${this.clearDialog}>Close</sl-button>
+      </sl-dialog>
+    `
   }
 
   /** When the client fails, display an error. */
@@ -181,7 +241,10 @@ export default class JwfInteraction extends LitElement {
 
   protected render() {
     return when(!this.hasError,
-      () => this.renderCanvas(),
+      () => html`
+        ${this.renderCanvas()}
+        ${this.renderDialog()}
+      `,
       () => this.renderError()
     );
   }

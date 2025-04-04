@@ -1,16 +1,17 @@
-import type { Image } from '../../../types/Image.ts';
+import { InteractionElement } from "../../../types/pages/InteractionElement.ts";
 
 export class Particle {
+  public drawn: boolean = false;
   public hovered: boolean = false;
+  public readonly interactionElement: InteractionElement;
 
-  private readonly ctx;
+  private readonly ctx: CanvasRenderingContext2D;
   private boundingBox: { x: number, y: number, width: number, height: number } | null = null;
-  private readonly image;
-  private readonly imageObject;
+  private readonly imageObject: HTMLImageElement;
 
-  constructor(ctx: CanvasRenderingContext2D, image: Image, imageUrl: string) {
+  constructor(ctx: CanvasRenderingContext2D, interactionElement: InteractionElement, imageUrl: string) {
     this.ctx = ctx;
-    this.image = image;
+    this.interactionElement = interactionElement;
     this.imageObject = new Image();
     this.imageObject.src = imageUrl;
     this.imageObject.onload = () => this.draw();
@@ -19,7 +20,7 @@ export class Particle {
   /** Method that determines where on the screen an image can be placed, based on its position group. */
   getPositionFromGroup() {
     const { width: cw, height: ch } = this.ctx.canvas;
-    const { width: iw, height: ih, positionGroup } = this.image;
+    const { width: iw, height: ih, positionGroup } = this.interactionElement.image;
 
     switch(positionGroup) {
       case "top-left":
@@ -37,26 +38,22 @@ export class Particle {
     }
   }
 
-  /** Is the point inside the boundingBox of the Particle? */
+  /** Is the given point inside the boundingBox of the Particle? */
   isPointInside(x: number, y: number): boolean {
-    if (!this.boundingBox) return false;
+    if (!this.drawn || !this.boundingBox) return false;
     const { x: bx, y: by, width, height } = this.boundingBox;
     return x >= bx && x <= bx + width && y >= by && y <= by + height;
   }
 
-  /** Method to update the hovered state on the Particle. */
-  setHovered(state: boolean) {
-    this.hovered = state;
-  }
-
   /** Draw images to the provided canvas. */
   draw() {
-    const { width, height } = this.image;
-    const position = this.getPositionFromGroup()
+    const { width, height } = this.interactionElement.image;
+    const position = this.getPositionFromGroup();
+
     this.boundingBox = { x: position.x, y: position.y, width, height };
+    this.drawn = true;
 
     if (this.hovered) {
-      // Draw hover highlight (e.g., border or glow)
       this.ctx.save();
       this.ctx.shadowColor = 'rgb(244, 157, 55)';
       this.ctx.shadowBlur = 50;

@@ -4,10 +4,10 @@ import { mobileBreakpoint } from './constants/constants.js';
 export default css`
   :host {
     position: relative;
-    box-sizing: border-box;
+    box-sizing: border-box; 
     font-family: 'Poppins', sans-serif;
     font-weight: var(--sl-font-weight-normal);
-    font-size: var(--sl-font-size-medium);
+    font-size: var(--sl-font-size-x-large);
     line-height: var(--sl-line-height-normal);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
