@@ -24,5 +24,7 @@ export type Image = {
     y: number;
     _type: string;
   };
+  height: number;
+  width: number;
   _type: string;
 };

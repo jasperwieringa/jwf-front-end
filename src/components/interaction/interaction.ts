@@ -1,9 +1,6 @@
 import { html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { styleMap } from 'lit/directives/style-map.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import { translate as t } from 'lit-i18n';
 import { consume } from '@lit/context';
 import {
@@ -12,38 +9,66 @@ import {
 } from '../../services/client-context.js';
 import { emit } from '../../utilities/event.js';
 import { JWF_EVENTS } from '../../utilities/constants/events.js';
+import { watch } from '../../utilities/watch.ts';
+import { isDefined } from '../../utilities/isDefined.ts';
 import { InteractionElement } from '../../types/pages/InteractionElement.js';
-import { PositionGroup } from '../../types/Image.js';
+import { Image, PositionGroup } from '../../types/Image.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
 import styles from './interaction.styles.js';
 
 import '@shoelace-style/shoelace/dist/components/alert/alert.js';
 import '@shoelace-style/shoelace/dist/components/icon/icon.js';
-import '../common/image/image.js';
+import { Particle } from './Particle/Particle.js';
 
 /**
  * @event jwf-loaded - An event fired when the component is done loading.
  */
 @customElement('jwf-interaction')
 export default class JwfInteraction extends LitElement {
+  private readonly resizeHandler = this.setCanvasSizeAndDraw.bind(this);
+
+  /** @internal - Stores the fetched images to prevent excessively fetching images. */
+  private storedParticles = new Map<string, Particle>();
+
   @consume({ context: clientContext })
   @property({ attribute: false })
   public client!: JwfClient;
 
   @state()
-  private _interactionsByPosition: Map<PositionGroup, InteractionElement[]> = new Map();
+  private interactionsByPosition: Map<PositionGroup, InteractionElement[]> = new Map();
+
+  @state()
+  private hasError: boolean = false;
+
+  @query('#main')
+  private canvas!: HTMLCanvasElement;
+
+  @watch('interactionsByPosition', { waitUntilFirstUpdate: true })
+  async handleInteractionsByPositionChange() {
+    if (this.groupInteractions.length === 0) return;
+    this.drawInteractionElements();
+  }
 
   static styles = styles;
 
-  async connectedCallback() {
+  connectedCallback() {
     super.connectedCallback();
-    const interactions = await this.client.query(API_QUERIES.interactions);
-    this._groupInteractions(interactions);
-    emit(this, JWF_EVENTS.JWF_LOADED);
+    window.addEventListener('resize', this.resizeHandler);
+
+    // Query the images
+    this.client.query(API_QUERIES.interactions)
+      .then(results => this.groupInteractions(results))
+      .catch(() => this.hasError = true)
+      .finally(() => emit(this, JWF_EVENTS.JWF_LOADED));
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('resize', this.resizeHandler);
   }
 
   /** Method that groups interactions by their provided positionGroup. */
-  private _groupInteractions(interactions: InteractionElement[]) {
+  private groupInteractions(interactions: InteractionElement[]) {
     const grouped = new Map<PositionGroup, InteractionElement[]>();
     interactions.forEach((element: InteractionElement) => {
       const position = element.image.positionGroup;
@@ -52,68 +77,112 @@ export default class JwfInteraction extends LitElement {
       }
       grouped.get(position)!.push(element);
     });
-    this._interactionsByPosition = grouped;
+    this.interactionsByPosition = grouped;
   }
 
-  private _logItem(item: InteractionElement) {
-    window.alert(`${item.title}: ${item.description}`);
+  /** Method that checks whether an image can actually fit within the canvas. */
+  private imageCanFitInCanvas(image: Image) {
+    return image.width < this.canvas.width && image.height < this.canvas.height;
   }
 
-  /** Method that renders the element to interact with. */
-  private _renderInteractionElement(item: InteractionElement) {
-    const { image, _id } = item;
-    const { alt, gridIndex, rowIndex } = image;
+  /** Resize canvas to match window. */
+  private resizeCanvas() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  }
 
+  /** Resize and re-draw when window resizes. */
+  private setCanvasSizeAndDraw() {
+    this.resizeCanvas();
+    this.drawInteractionElements();
+  }
+
+  /** Method that iterates through the fetched images. */
+  private drawInteractionElements() {
+    if (!this.canvas) return;
+
+    // Clear old images on resize
+    const ctx = this.canvas.getContext('2d')!;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Loop through all positions (top-left, top-right etc.)
+    [...this.interactionsByPosition.keys()].forEach(key => {
+      // Loop through each item in a specific position group
+      [...this.interactionsByPosition.get(key)!].forEach((item) => {
+        const { image, _id } = item;
+        const storedParticle = this.storedParticles.get(_id);
+
+        // If the particle does not exist yet, create it
+        if (!isDefined(storedParticle)) {
+          this.storedParticles.set(_id, new Particle(
+            ctx,
+            image,
+            this.client.urlForImage(image).url()
+          ));
+          return;
+        }
+
+        // If the particle does exist, re-draw it
+        if (this.imageCanFitInCanvas(image)) {
+          storedParticle.draw();
+        }
+      });
+    })
+  }
+
+  /** Handle the mouse movement on the Canvas. */
+  private handleMouseMove(event: MouseEvent) {
+    // Get the boundary of the canvas
+    const rect = this.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    let needsRedraw = false;
+
+    // Iterate through all particles and see whether the mouse is hovering over it
+    for (const particle of this.storedParticles.values()) {
+      const isHovering = particle.isPointInside(x, y);
+      if (particle.hovered !== isHovering) {
+        particle.setHovered(isHovering);
+        needsRedraw = true;
+      }
+    }
+
+    // Redraw if there is anything being hovered
+    if (needsRedraw) {
+      this.setCanvasSizeAndDraw();
+    }
+  }
+
+  /** Draw a canvas object to add SVGs to. */
+  private renderCanvas() {
     return html`
-      <jwf-image
-        id=${ifDefined(_id)}
-        tabindex="0"
-        src=${this.client.urlForImage(image).url()}
-        alt=${ifDefined(alt || undefined)}
-        style=${styleMap({
-          'grid-column': gridIndex !== 0 ? gridIndex : undefined,
-          'grid-row': rowIndex !== 0 ? rowIndex : undefined,
-        })}
-        @click=${() => this._logItem(item)}
-      ></jwf-image>
+      <canvas 
+        id="main" 
+        width=${window.innerWidth} 
+        height=${window.innerHeight}
+        @mousemove=${this.handleMouseMove}
+      ></canvas>
     `;
   }
 
-  /** Iterate through all positions and place interactionElements. */
-  private _renderGridElements() {
-    return html`
-      <div id="main">
-        ${repeat([...this._interactionsByPosition.keys()], (key) => {
-          const elements = repeat(this._interactionsByPosition.get(key)!, (item) => this._renderInteractionElement(item));
-          
-          return html`
-            <div class=${key}>
-              ${when(key === 'bottom-right', () => html`
-                <div class="wrapper">${elements}</div>
-              `, () => html`${elements}`)}
-            </div>
-          `
-        })}
-      </div>
-    `;
-  }
-
-  private _renderError() {
+  /** When the client fails, display an error. */
+  private renderError() {
     return html`
       <div class="page--no-upload">
         <sl-alert variant="primary" open>
           <sl-icon slot="icon" name="info-circle"></sl-icon>
           <strong>${t('general.error')}</strong><br />
-          ${t('section_errors.missing_interaction')}
+          ${t('section_errors.missing_interactions')}
         </sl-alert>
       </div>
     `;
   }
 
   protected render() {
-    return when(this._interactionsByPosition.size > 0,
-      () => this._renderGridElements(),
-      () => this._renderError()
+    return when(!this.hasError,
+      () => this.renderCanvas(),
+      () => this.renderError()
     );
   }
 }
