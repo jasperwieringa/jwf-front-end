@@ -68,7 +68,7 @@ export default class JwfInteraction extends LitElement {
   }
 
   /** Method that groups interactions by their provided positionGroup. */
-  private groupInteractions(interactions) {
+  private groupInteractions(interactions: InteractionElement[]) {
     const grouped = new Map<PositionGroup, InteractionElement[]>();
     interactions.forEach((element: InteractionElement) => {
       const position = element.image.positionGroup;
@@ -94,15 +94,16 @@ export default class JwfInteraction extends LitElement {
 
   /** Method that iterates through the fetched images. */
   private drawInteractionElements() {
-    const ctx = this.canvas.getContext('2d');
+    if (!this.canvas) return;
 
     // Clear old images on resize
+    const ctx = this.canvas.getContext('2d')!;
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Loop through all positions (top-left, top-right etc.)
     [...this.interactionsByPosition.keys()].forEach(key => {
       // Loop through each item in a specific position group
-      [...this.interactionsByPosition.get(key)].forEach((item) => {
+      [...this.interactionsByPosition.get(key)!].forEach((item) => {
         const { image, _id } = item;
         const storedParticle = this.storedParticles.get(_id);
 
