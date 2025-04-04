@@ -188,6 +188,7 @@ export default class JwfInteraction extends LitElement {
     // Iterate through all particles and see whether the mouse is hovering over it
     for (const particle of this.storedParticles.values()) {
       const isHovering = particle.isPointInside(x, y);
+
       if (particle.hovered !== isHovering) {
         particle.hovered = isHovering;
         needsRedraw = true;
@@ -217,7 +218,7 @@ export default class JwfInteraction extends LitElement {
   private renderDialog() {
     return html`
       <sl-dialog 
-        id="dialog" 
+        id="dialog"
         @sl-hide=${this.clearDialog}
       >
         <div id="dialog-body"></div>

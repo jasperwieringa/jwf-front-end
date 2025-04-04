@@ -11,5 +11,13 @@ export default [
       top: 0;
       left: 0;
     }
+    
+    sl-dialog::part(title) {
+      font-size: var(--sl-font-size-2x-large);
+    }
+    
+    sl-button::part(base) {
+      color: var(--sl-color-primary-100);
+    }
   `
 ]

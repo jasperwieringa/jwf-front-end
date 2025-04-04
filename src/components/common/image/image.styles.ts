@@ -26,7 +26,7 @@ export default [
     
     #loader {
       font-size: 6rem;
-      --indicator-color: var(--jwf-color-primary);
+      --indicator-color: var(--sl-color-primary-600);
       --track-width: 4px;
     }
   `,

@@ -24,7 +24,7 @@ export default [
 
       .word {
         display: block;
-        color: var(--jwf-color-primary);
+        color: var(--sl-color-primary-600);
         animation: spin_jwf 4s infinite;
       }
     }

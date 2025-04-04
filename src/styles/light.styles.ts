@@ -5,8 +5,7 @@ export default css`
   :host,
   .sl-theme-light {
     color-scheme: light;
-
-    --jwf-color-primary: rgb(244, 157, 55);
+    
     --jwf-color-background: var(--sl-color-neutral-0);
 
     --sl-color-gray-50: hsl(0 0% 97.5%);
@@ -225,17 +224,17 @@ export default css`
     --sl-color-rose-900: hsl(341.5 75.5% 30.4%);
     --sl-color-rose-950: hsl(341.3 70.1% 17.1%);
 
-    --sl-color-primary-50: var(--sl-color-sky-50);
-    --sl-color-primary-100: var(--sl-color-sky-100);
-    --sl-color-primary-200: var(--sl-color-sky-200);
-    --sl-color-primary-300: var(--sl-color-sky-300);
-    --sl-color-primary-400: var(--sl-color-sky-400);
-    --sl-color-primary-500: var(--sl-color-sky-500);
-    --sl-color-primary-600: var(--sl-color-sky-600);
-    --sl-color-primary-700: var(--sl-color-sky-700);
-    --sl-color-primary-800: var(--sl-color-sky-800);
-    --sl-color-primary-900: var(--sl-color-sky-900);
-    --sl-color-primary-950: var(--sl-color-sky-950);
+    --sl-color-primary-50: hsl(33 100% 97%);
+    --sl-color-primary-100: hsl(33 95% 91%);
+    --sl-color-primary-200: hsl(33 90% 83%);
+    --sl-color-primary-300: hsl(33 92% 70%);
+    --sl-color-primary-400: hsl(33 94% 60%);
+    --sl-color-primary-500: hsl(33 90% 58%);
+    --sl-color-primary-600: hsl(33 96% 48%);
+    --sl-color-primary-700: hsl(33 90% 40%);
+    --sl-color-primary-800: hsl(33 85% 32%);
+    --sl-color-primary-900: hsl(33 75% 25%);
+    --sl-color-primary-950: hsl(33 60% 16%);
 
     --sl-color-success-50: var(--sl-color-green-50);
     --sl-color-success-100: var(--sl-color-green-100);
