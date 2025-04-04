@@ -1,6 +1,6 @@
 export class Particle {
-  private ctx;
-  private image;
+  private readonly ctx;
+  private readonly image;
 
   constructor(ctx, imageUrl) {
     this.ctx = ctx;

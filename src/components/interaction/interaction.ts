@@ -10,9 +10,9 @@ import {
 import { emit } from '../../utilities/event.js';
 import { JWF_EVENTS } from '../../utilities/constants/events.js';
 import { watch } from '../../utilities/watch.ts';
-import { hasItems } from '../../utilities/hasItems.ts';
 import { isDefined } from '../../utilities/isDefined.ts';
 import { InteractionElement } from '../../types/pages/InteractionElement.js';
+import { PositionGroup } from '../../types/Image.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
 import styles from './interaction.styles.js';
 
@@ -35,29 +35,30 @@ export default class JwfInteraction extends LitElement {
   public client!: JwfClient;
 
   @state()
-  private _interactionElements: InteractionElement[] = [];
+  private interactionsByPosition: Map<PositionGroup, InteractionElement[]> = new Map();
 
   @state()
-  private _hasError: boolean = false;
+  private hasError: boolean = false;
 
   @query('#main')
-  private canvas?: HTMLCanvasElement;
+  private canvas!: HTMLCanvasElement;
 
-  @watch('_interactionElements')
-  handleInteractionElementsChange() {
-    if (!hasItems(this._interactionElements)) return;
+  @watch('interactionsByPosition', { waitUntilFirstUpdate: true })
+  async handleInteractionsByPositionChange() {
+    if (this.groupInteractions.length === 0) return;
     this.drawInteractionElements();
   }
 
   static styles = styles;
 
-  async connectedCallback() {
+  connectedCallback() {
     super.connectedCallback();
     window.addEventListener('resize', this.resizeHandler);
 
     // Query the images
-    this._interactionElements = await this.client.query(API_QUERIES.interactions)
-      .catch(() => this._hasError = true)
+    this.client.query(API_QUERIES.interactions)
+      .then(results => this.groupInteractions(results))
+      .catch(() => this.hasError = true)
       .finally(() => emit(this, JWF_EVENTS.JWF_LOADED));
   }
 
@@ -66,9 +67,21 @@ export default class JwfInteraction extends LitElement {
     window.removeEventListener('resize', this.resizeHandler);
   }
 
+  /** Method that groups interactions by their provided positionGroup. */
+  private groupInteractions(interactions) {
+    const grouped = new Map<PositionGroup, InteractionElement[]>();
+    interactions.forEach((element: InteractionElement) => {
+      const position = element.image.positionGroup;
+      if (!grouped.has(position)) {
+        grouped.set(position, []);
+      }
+      grouped.get(position)!.push(element);
+    });
+    this.interactionsByPosition = grouped;
+  }
+
   /** Resize canvas to match window. */
   private resizeCanvas() {
-    if (!this.canvas) return;
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
   }
@@ -79,26 +92,29 @@ export default class JwfInteraction extends LitElement {
     this.drawInteractionElements();
   }
 
-  /** Method that renders the element to interact with. */
+  /** Method that iterates through the fetched images. */
   private drawInteractionElements() {
-    if (!this.canvas) return;
     const ctx = this.canvas.getContext('2d');
 
     // Clear old images on resize
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Iterate through the fetched images
-    this._interactionElements.forEach(item => {
-      const { image, _id } = item;
-      const storedParticle = this.storedParticles.get(_id);
+    // Loop through all positions (top-left, top-right etc.)
+    [...this.interactionsByPosition.keys()].forEach(key => {
+      // Loop through each item in a specific position group
+      [...this.interactionsByPosition.get(key)].forEach((item) => {
+        const { image, _id } = item;
+        const storedParticle = this.storedParticles.get(_id);
 
-      // If the particle does not exist yet, create it
-      if (!isDefined(storedParticle)) {
-        this.storedParticles.set(_id, new Particle(ctx, this.client.urlForImage(image).url()));
-        return;
-      }
-      // If the particle does exist, re-draw it
-      storedParticle.draw();
+        // If the particle does not exist yet, create it
+        if (!isDefined(storedParticle)) {
+          this.storedParticles.set(_id, new Particle(ctx, this.client.urlForImage(image).url()));
+          return;
+        }
+
+        // If the particle does exist, re-draw it
+        storedParticle.draw();
+      });
     })
   }
 
@@ -116,14 +132,14 @@ export default class JwfInteraction extends LitElement {
         <sl-alert variant="primary" open>
           <sl-icon slot="icon" name="info-circle"></sl-icon>
           <strong>${t('general.error')}</strong><br />
-          ${t('section_errors.missing_interaction')}
+          ${t('section_errors.missing_interactions')}
         </sl-alert>
       </div>
     `;
   }
 
   protected render() {
-    return when(!this._hasError,
+    return when(!this.hasError,
       () => this.renderCanvas(),
       () => this.renderError()
     );
