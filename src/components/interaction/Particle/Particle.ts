@@ -15,25 +15,26 @@ export class Particle {
 
   /** Method that determines where on the screen an image can be placed, based on its position group. */
   getPositionFromGroup() {
-    const { width: canvasWidth, height: canvasHeight } = this.ctx.canvas;
-    const { width: imageWidth, height: imageHeight } = this.image;
+    const { width: cw, height: ch } = this.ctx.canvas;
+    const { width: iw, height: ih, positionGroup } = this.image;
 
-    switch(this.image.positionGroup) {
+    switch(positionGroup) {
       case "top-left":
         return { x: 0, y: 0 };
       case "top-right":
-        return { x: canvasWidth - imageWidth, y: 0 };
+        return { x: cw - iw, y: 0 };
       case "bottom-left":
-        return { x: 0, y: canvasHeight - imageHeight };
+        return { x: 0, y: ch - ih };
       case "bottom-right":
-        return { x: canvasWidth - imageWidth, y: canvasHeight - imageHeight };
+        return { x: cw - iw, y: ch - ih };
       case "center":
-        return { x: (canvasWidth - imageWidth) / 2, y: (canvasHeight - imageHeight) / 2 };
+        return { x: (cw - iw) / 2, y: (ch - ih) / 2 };
       default:
-        return { x: 0, y: 0}; // fallback
+        return { x: 0, y: 0};
     }
   }
-  
+
+  /** Draw images to the provided canvas. */
   draw() {
     const position = this.getPositionFromGroup()
     this.ctx.drawImage(this.imageObject, position.x, position.y, this.image.width, this.image.height);
