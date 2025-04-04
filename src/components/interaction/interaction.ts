@@ -108,7 +108,11 @@ export default class JwfInteraction extends LitElement {
 
         // If the particle does not exist yet, create it
         if (!isDefined(storedParticle)) {
-          this.storedParticles.set(_id, new Particle(ctx, this.client.urlForImage(image).url()));
+          this.storedParticles.set(_id, new Particle(
+            ctx,
+            image,
+            this.client.urlForImage(image).url()
+          ));
           return;
         }
 
