@@ -5,16 +5,20 @@ export class Particle {
   public hovered: boolean = false;
   public readonly interactionElement: InteractionElement;
 
+  private readonly padding = 32;
   private readonly ctx: CanvasRenderingContext2D;
-  private boundingBox: { x: number, y: number, width: number, height: number } | null = null;
   private readonly imageObject: HTMLImageElement;
+
+  private boundingBox: { x: number, y: number, width: number, height: number } | null = null;
 
   constructor(ctx: CanvasRenderingContext2D, interactionElement: InteractionElement, imageUrl: string) {
     this.ctx = ctx;
     this.interactionElement = interactionElement;
     this.imageObject = new Image();
     this.imageObject.src = imageUrl;
-    this.imageObject.onload = () => this.draw();
+    this.imageObject.onload = () => {
+      if (this.canFitInCanvas()) this.draw();
+    };
   }
 
   /** Method that determines where on the screen an image can be placed, based on its position group. */
@@ -24,18 +28,23 @@ export class Particle {
 
     switch(positionGroup) {
       case "top-left":
-        return { x: 0, y: 0 };
+        return { x: this.padding, y: this.padding };
       case "top-right":
-        return { x: cw - iw, y: 0 };
+        return { x: cw - iw - this.padding, y: this.padding };
       case "bottom-left":
-        return { x: 0, y: ch - ih };
+        return { x: this.padding, y: ch - ih - this.padding };
       case "bottom-right":
-        return { x: cw - iw, y: ch - ih };
+        return { x: cw - iw - this.padding, y: ch - ih - this.padding };
       case "center":
         return { x: (cw - iw) / 2, y: (ch - ih) / 2 };
       default:
-        return { x: 0, y: 0};
+        return { x: this.padding, y: this.padding };
     }
+  }
+
+  /** Method that checks whether an image can actually fit within the canvas. */
+  canFitInCanvas() {
+    return this.imageObject.width < this.ctx.canvas.width && this.imageObject.height < this.ctx.canvas.height;
   }
 
   /** Is the given point inside the boundingBox of the Particle? */

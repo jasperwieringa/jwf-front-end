@@ -13,7 +13,7 @@ import { JWF_EVENTS } from '../../utilities/constants/events.js';
 import { watch } from '../../utilities/watch.ts';
 import { isDefined } from '../../utilities/isDefined.ts';
 import { InteractionElement } from '../../types/pages/InteractionElement.js';
-import { Image, PositionGroup } from '../../types/Image.js';
+import { PositionGroup } from '../../types/Image.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
 import styles from './interaction.styles.js';
 
@@ -82,11 +82,6 @@ export default class JwfInteraction extends LitElement {
     this.interactionsByPosition = grouped;
   }
 
-  /** Method that checks whether an image can actually fit within the canvas. */
-  private imageCanFitInCanvas(image: Image) {
-    return image.width < this.canvas.width && image.height < this.canvas.height;
-  }
-
   /** Resize canvas to match window. */
   private resizeCanvas() {
     this.canvas.width = window.innerWidth;
@@ -108,9 +103,8 @@ export default class JwfInteraction extends LitElement {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Loop through all positions (top-left, top-right etc.)
-    [...this.interactionsByPosition.keys()].forEach(key => {
-      // Loop through each item in a specific position group
-      [...this.interactionsByPosition.get(key)!].forEach((interactionElement) => {
+    this.interactionsByPosition.forEach((elements) => {
+      for (const interactionElement of elements) {
         const { image, _id } = interactionElement;
         const storedParticle = this.storedParticles.get(_id);
 
@@ -124,14 +118,13 @@ export default class JwfInteraction extends LitElement {
           return;
         }
 
-        // If the particle does exist, re-draw it
-        if (this.imageCanFitInCanvas(image)) {
+        if (storedParticle.canFitInCanvas()) {
           storedParticle.draw();
         } else {
           storedParticle.drawn = false;
         }
-      });
-    })
+      }
+    });
   }
 
   /** Get the X and Y of the mouse click. */
