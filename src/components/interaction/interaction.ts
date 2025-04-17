@@ -19,8 +19,6 @@ import styles from './interaction.styles.js';
 
 import '@shoelace-style/shoelace/dist/components/alert/alert.js';
 import '@shoelace-style/shoelace/dist/components/button/button.js';
-import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
 import '@shoelace-style/shoelace/dist/components/icon/icon.js';
 import { Particle } from './Particle/Particle.js';
 
@@ -47,12 +45,6 @@ export default class JwfInteraction extends LitElement {
   @query('#main')
   private canvas!: HTMLCanvasElement;
 
-  @query('#dialog')
-  private dialog!: SlDialog;
-
-  @query('#dialog-body')
-  private body!: HTMLDivElement;
-
   @watch('interactionsByPosition', { waitUntilFirstUpdate: true })
   async handleInteractionsByPositionChange() {
     if (this.groupInteractions.length === 0) return;
@@ -75,20 +67,6 @@ export default class JwfInteraction extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('resize', this.resizeHandler);
-  }
-
-  /** Method that updates the dialog information. */
-  private setDialogInformation(title: string, description: string): void {
-    this.dialog.label = title;
-    this.body.textContent = description;
-    this.dialog.show();
-  }
-
-  /** Clear and hide the dialog. */
-  private clearDialog() {
-    this.dialog.label = '';
-    this.dialog.open = false;
-    this.body.textContent = '';
   }
 
   /** Method that groups interactions by their provided positionGroup. */
@@ -174,7 +152,9 @@ export default class JwfInteraction extends LitElement {
       const isClicked = particle.isPointInside(x, y);
 
       if (isClicked && particle.drawn) {
-        this.setDialogInformation(title, description);
+        emit(this, JWF_EVENTS.JWF_OPEN_DIALOG, {
+          detail: { title, description }
+        });
       }
     }
   }
@@ -182,7 +162,7 @@ export default class JwfInteraction extends LitElement {
   /** Handle the mouse movement on the Canvas. */
   private handleMouseMove(event: MouseEvent) {
     const { x, y } = this.getMousePosition(event);
-
+    let particleIsHovered = false;
     let needsRedraw = false;
 
     // Iterate through all particles and see whether the mouse is hovering over it
@@ -193,7 +173,14 @@ export default class JwfInteraction extends LitElement {
         particle.hovered = isHovering;
         needsRedraw = true;
       }
+
+      if (isHovering) {
+        particleIsHovered = true;
+      }
     }
+
+    // Update the canvas cursor when hovering over an item
+    this.canvas.style.cursor = particleIsHovered ? 'pointer' : 'unset';
 
     // Redraw if there is anything being hovered
     if (needsRedraw) {
@@ -214,19 +201,6 @@ export default class JwfInteraction extends LitElement {
     `;
   }
 
-  /** Draw a shoelace Dialog that displays Particle information. */
-  private renderDialog() {
-    return html`
-      <sl-dialog 
-        id="dialog"
-        @sl-hide=${this.clearDialog}
-      >
-        <div id="dialog-body"></div>
-        <sl-button slot="footer" variant="primary" @click=${this.clearDialog}>Close</sl-button>
-      </sl-dialog>
-    `
-  }
-
   /** When the client fails, display an error. */
   private renderError() {
     return html`
@@ -242,10 +216,7 @@ export default class JwfInteraction extends LitElement {
 
   protected render() {
     return when(!this.hasError,
-      () => html`
-        ${this.renderCanvas()}
-        ${this.renderDialog()}
-      `,
+      () => this.renderCanvas(),
       () => this.renderError()
     );
   }

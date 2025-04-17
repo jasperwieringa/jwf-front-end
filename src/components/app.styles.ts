@@ -15,12 +15,7 @@ export default [
       background-color: var(--jwf-color-background);
     }
 
-    #pageElements {
-      height: 100%;
-      overflow: hidden;
-    }
-
-    #pageElements > * {
+    jwf-interaction {
       height: 100%;
       display: grid;
     }

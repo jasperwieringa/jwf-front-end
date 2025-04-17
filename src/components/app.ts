@@ -4,7 +4,6 @@ import { when } from 'lit/directives/when.js';
 import { provide } from '@lit/context';
 import { clientContext } from '../services/client-context.js';
 import { JwfClient } from '../services/JwfClient.ts';
-import { isDefined } from '../utilities/isDefined.js';
 import { Theme } from '../types/Theme.js';
 import '../assets/translations/translations.js';
 import styles from './app.styles.js';
@@ -12,6 +11,8 @@ import styles from './app.styles.js';
 import './interaction/interaction.js';
 import './common/loader/loader.js';
 import './common/rtt/rtt.js';
+import type Dialog from './common/dialog/dialog.js';
+import './common/dialog/dialog.js';
 
 @customElement('jwf-app')
 export default class App extends LitElement {
@@ -24,11 +25,8 @@ export default class App extends LitElement {
   @state()
   private _loading: boolean = true;
 
-  @query('#pageElements')
-  _sectionsRef?: HTMLElement;
-
-  /** @internal Keep track of the loaded page elements */
-  private _loadedPageElements: Map<string, boolean> = new Map();
+  @query('#dialog')
+  _dialogRef?: Dialog;
 
   static styles = styles;
 
@@ -50,40 +48,18 @@ export default class App extends LitElement {
   }
 
   // Used to store each loaded page element in the _loadedPageElements Map object
-  private _handleElementLoaded(event: CustomEvent) {
-    const tagName = (event.target as HTMLElement).tagName.toLowerCase();
-    this._loadedPageElements.set(tagName, true);
-
-    if (this._allElementsLoaded()) {
-      this._loading = false;
-      this._loadedPageElements.clear();
-    }
+  private _handleLoaded() {
+    this._loading = false;
   }
 
-  // Are all page elements loaded?
-  private _allElementsLoaded() {
-    return this._loadedPageElements.size === this._sectionsRef!.children.length;
-  }
-
-  /** Method that renders all page elements */
-  private _renderPageElements() {
-    return html`
-      <div id="pageElements" ?hidden=${this._loading} @jwf-loaded=${this._handleElementLoaded}>
-        <jwf-interaction></jwf-interaction>
-      </div>
-    `
+  /** Method that opens the dialog */
+  private _handleOpenDialog(e: CustomEvent) {
+    this._dialogRef!.open(e.detail);
   }
 
   /** Method that renders a JWF loader */
   private _renderLoader() {
     return html`<jwf-loader></jwf-loader>`;
-  }
-
-  /** Method that renders a return to top button */
-  private _renderReturnToTop() {
-    return html`
-      <jwf-rtt .target=${this._sectionsRef!}></jwf-rtt>
-    `;
   }
 
   protected render() {
@@ -93,10 +69,11 @@ export default class App extends LitElement {
         class="container sl-theme-${this.theme}"
         role="main"
         @keydown=${this._handleKeyDown}
+        @jwf-open-dialog=${this._handleOpenDialog}
       >
-        ${this._renderPageElements()}
+        <jwf-interaction ?hidden=${this._loading} @jwf-loaded=${this._handleLoaded}></jwf-interaction>
+        <jwf-dialog id="dialog"></jwf-dialog>
         ${when(this._loading, () => this._renderLoader())}
-        ${when(isDefined(this._sectionsRef), () => this._renderReturnToTop())}
       </main>
     `;
   }
