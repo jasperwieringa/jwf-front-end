@@ -39,7 +39,7 @@ export default class Dialog extends LitElement {
         @sl-hide=${this.close}
       >
         <div>${this._content}</div>
-        <sl-button slot="footer" variant="primary" @click=${this.close}>Close</sl-button>
+        <sl-button slot="footer" variant="primary" outline @click=${this.close}>Close</sl-button>
       </sl-dialog>
     `;
   }

@@ -44,7 +44,7 @@ export default class Image extends LitElement {
 
   protected render() {
     return html`
-      <div id="main">
+      <div id="main" role="img" aria-label=${this.alt ?? ''}>
         ${until(this.svg, html`<sl-spinner id="loader"></sl-spinner>`)}
       </div>
     `;

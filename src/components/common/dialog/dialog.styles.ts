@@ -8,8 +8,8 @@ export default [
       font-size: var(--sl-font-size-2x-large);
     }
     
-    sl-button::part(base) {
-      color: var(--sl-color-primary-100);
+    sl-dialog::part(title) {
+      color: var(--sl-color-primary-600);
     }
   `
 ]

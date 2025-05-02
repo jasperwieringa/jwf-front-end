@@ -63,16 +63,11 @@ export default class JwfInteraction extends LitElement {
   /** Handle the keyboard input on the image. */
   private handleKeyDown(e: KeyboardEvent, item: InteractionElement) {
     if (e.key !== 'Enter') return;
-
-    const { title, description } = item;
-
-    emit(this, JWF_EVENTS.JWF_OPEN_DIALOG, {
-      detail: { title, description }
-    });
+    this.handleOpenDialog(item);
   }
 
   /** Handle the mouse click on the image. */
-  private handleMouseClick(item: InteractionElement) {
+  private handleOpenDialog(item: InteractionElement) {
     const { title, description } = item;
 
     emit(this, JWF_EVENTS.JWF_OPEN_DIALOG, {
@@ -96,7 +91,7 @@ export default class JwfInteraction extends LitElement {
           'grid-row': rowIndex !== 0 ? rowIndex : undefined,
         })}
         @keydown=${(e: KeyboardEvent) => this.handleKeyDown(e, item)}
-        @click=${() => this.handleMouseClick(item)}
+        @click=${() => this.handleOpenDialog(item)}
       ></jwf-image>
     `;
   }
