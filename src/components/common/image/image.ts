@@ -2,15 +2,10 @@ import { html, LitElement, TemplateResult } from 'lit';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { until } from 'lit/directives/until.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 import { watch } from '../../../utilities/watch.js';
 import styles from './image.styles.js';
 
-import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
-
-/**
- * @event jwf-image-loaded - Emitted when the image is loaded.
- * @event jwf-error - Emitted when the image cannot be loaded.
- */
 @customElement('jwf-image')
 export default class Image extends LitElement {
   /** Set the path to the image. */

@@ -16,8 +16,9 @@
     "@sanity/client": "^6.4.0",
     "@sanity/image-url": "^1.1.0",
     "@shoelace-style/shoelace": "2.12.0",
-    "lit": "^3.2.1",
+    "animejs": "^4.0.2",
     "i18next": "^23.7.16",
+    "lit": "^3.2.1",
     "lit-i18n": "^4.1.0"
   },
   "devDependencies": {
