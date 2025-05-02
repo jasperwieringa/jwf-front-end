@@ -13,6 +13,7 @@ export default [
       height: 100svh;
       color: var(--sl-color-neutral-900);
       background-color: var(--jwf-color-background);
+      overflow: hidden;
     }
 
     jwf-interaction {

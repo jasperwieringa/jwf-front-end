@@ -17,7 +17,7 @@ import { JWF_EVENTS } from '../../utilities/constants/events.js';
 import { InteractionElement } from '../../types/pages/InteractionElement.js';
 import { PositionGroup } from '../../types/Image.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
-import '../common/image/image.js';
+import './interaction-element/interaction-element.js';
 import styles from './interaction.styles.js';
 
 /**
@@ -81,18 +81,19 @@ export default class JwfInteraction extends LitElement {
     const { alt, gridIndex, rowIndex } = image;
 
     return html`
-      <jwf-image
-        id=${ifDefined(_id)}
-        tabindex="0"
-        src=${this.client.urlForImage(image).url()}
-        alt=${ifDefined(alt || undefined)}
-        style=${styleMap({
-          'grid-column': gridIndex !== 0 ? gridIndex : undefined,
-          'grid-row': rowIndex !== 0 ? rowIndex : undefined,
-        })}
-        @keydown=${(e: KeyboardEvent) => this.handleKeyDown(e, item)}
-        @click=${() => this.handleOpenDialog(item)}
-      ></jwf-image>
+      <div style=${styleMap({
+        'grid-column': gridIndex !== 0 ? gridIndex : undefined,
+        'grid-row': rowIndex !== 0 ? rowIndex : undefined,
+      })}>
+        <jwf-interaction-element
+          id=${ifDefined(_id)}
+          .container=${this}
+          src=${this.client.urlForImage(image).url()}
+          alt=${ifDefined(alt || undefined)}
+          @keydown=${(e: KeyboardEvent) => this.handleKeyDown(e, item)}
+          @click=${() => this.handleOpenDialog(item)}
+        ></jwf-interaction-element>
+      </div>
     `;
   }
 

@@ -4,10 +4,16 @@ import { until } from 'lit/directives/until.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 import { watch } from '../../../utilities/watch.js';
-import styles from './image.styles.js';
+import { Animate } from '../../../utilities/animate.ts';
+import styles from './interaction-element.styles.js';
 
-@customElement('jwf-image')
-export default class Image extends LitElement {
+@customElement('jwf-interaction-element')
+export default class InteractionElement extends LitElement {
+  private animateInstance = new Animate(this);
+
+  @property({ type: Object })
+  public container?: HTMLElement;
+
   /** Set the path to the image. */
   @property({ type: String })
   public src?: string;
@@ -30,6 +36,7 @@ export default class Image extends LitElement {
 
   @watch('src')
   handleSrcChange() {
+    this.animateInstance.attachDraggable(this.container);
     this._loadImage();
   }
 
@@ -42,9 +49,22 @@ export default class Image extends LitElement {
       .then(svg => this.svg = html`${unsafeSVG(svg)}`);
   }
 
+  private handleMouseDown(e: MouseEvent) {
+    e.preventDefault();
+    this.animateInstance.stopAnimations();
+  }
+
   protected render() {
     return html`
-      <div id="main" role="img" aria-label=${this.alt ?? ''}>
+      <div 
+        id="main" 
+        role="img" 
+        aria-label=${this.alt ?? ''}
+        tabindex="0"
+        @mousedown=${this.handleMouseDown}
+        @focusin=${() => this.animateInstance.restartAnimation()}
+        @focusout=${() => this.animateInstance.stopAnimations()}
+      >
         ${until(this.svg, html`<sl-spinner id="loader"></sl-spinner>`)}
       </div>
     `;
@@ -53,6 +73,6 @@ export default class Image extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'jwf-image': Image;
+    'jwf-interaction-element': InteractionElement;
   }
 }

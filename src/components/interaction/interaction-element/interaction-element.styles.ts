@@ -10,7 +10,7 @@ export default [
       --filter: drop-shadow(0 0 10px rgb(244, 157, 55));
     }
 
-    :host(:focus-visible) {
+    #main:focus-visible {
       outline: none;
       box-shadow: none;
       
