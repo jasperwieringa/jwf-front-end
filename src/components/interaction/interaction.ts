@@ -60,25 +60,10 @@ export default class JwfInteraction extends LitElement {
     this.interactionsByPosition = grouped;
   }
 
-  /** Handle the keyboard input on the image. */
-  private handleKeyDown(e: KeyboardEvent, item: InteractionElement) {
-    if (e.key !== 'Enter') return;
-    this.handleOpenDialog(item);
-  }
-
-  /** Handle the mouse click on the image. */
-  private handleOpenDialog(item: InteractionElement) {
-    const { title, description } = item;
-
-    emit(this, JWF_EVENTS.JWF_OPEN_DIALOG, {
-      detail: { title, description }
-    });
-  }
-
   /** Method that renders the element to interact with. */
   private renderInteractionElement(item: InteractionElement) {
     const { image, _id } = item;
-    const { alt, gridIndex, rowIndex } = image;
+    const { gridIndex, rowIndex } = image;
 
     return html`
       <div style=${styleMap({
@@ -88,10 +73,7 @@ export default class JwfInteraction extends LitElement {
         <jwf-interaction-element
           id=${ifDefined(_id)}
           .container=${this}
-          src=${this.client.urlForImage(image).url()}
-          alt=${ifDefined(alt || undefined)}
-          @keydown=${(e: KeyboardEvent) => this.handleKeyDown(e, item)}
-          @click=${() => this.handleOpenDialog(item)}
+          .interactionElement=${item}
         ></jwf-interaction-element>
       </div>
     `;

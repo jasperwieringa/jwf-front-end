@@ -11,6 +11,7 @@ export default [
     
     sl-dialog::part(body) {
       padding-top: 0;
+      padding-bottom: 0;
     }
     
     ul {

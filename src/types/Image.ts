@@ -4,6 +4,7 @@ export type PositionGroup = typeof POSITION_GROUPS[number];
 export type Image = {
   alt: string;
   positionGroup: PositionGroup;
+  tabIndex: number;
   gridIndex: number;
   rowIndex: number;
   asset: {
