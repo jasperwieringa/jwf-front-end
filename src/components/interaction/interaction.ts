@@ -14,10 +14,12 @@ import {
 } from '../../services/client-context.js';
 import { emit } from '../../utilities/event.js';
 import { JWF_EVENTS } from '../../utilities/constants/events.js';
+import { isMobile } from '../../utilities/mobile.ts';
 import { InteractionElement } from '../../types/pages/InteractionElement.js';
 import { PositionGroup } from '../../types/Image.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
 import './interaction-element/interaction-element.js';
+import './mobile/mobile.js';
 import styles from './interaction.styles.js';
 
 /**
@@ -112,10 +114,13 @@ export default class JwfInteraction extends LitElement {
   }
 
   protected render() {
-    return when(this.interactionsByPosition.size > 0 && !this.hasError,
-      () => this.renderGridElements(),
-      () => this.renderError()
-    );
+    return when(!isMobile(),
+      () => when(this.interactionsByPosition.size > 0 && !this.hasError,
+        () => this.renderGridElements(),
+        () => this.renderError()
+      ), () => html`
+        <jwf-mobile .container=${this}></jwf-mobile>
+      `)
   }
 }
 
