@@ -34,6 +34,9 @@ export default class InteractionElement extends LitElement {
   @state()
   private svg?: TemplateResult;
 
+  @state()
+  private hasFocus: boolean = false;
+
   @watch('src')
   handleSrcChange() {
     this.animateInstance.attachDraggable(this.container);
@@ -41,6 +44,16 @@ export default class InteractionElement extends LitElement {
   }
 
   static styles = styles;
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('mouseup', this.handleMouseUp.bind(this));
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('mouseup', this.handleMouseUp.bind(this));
+  }
 
   // Load the image and handle the response
   private _loadImage() {
@@ -54,6 +67,22 @@ export default class InteractionElement extends LitElement {
     this.animateInstance.stopAnimations();
   }
 
+  private handleMouseUp() {
+    if (this.hasFocus) {
+      this.animateInstance.restartAnimation();
+    }
+  }
+
+  private handleFocusIn() {
+    this.hasFocus = true;
+    this.animateInstance.restartAnimation();
+  }
+
+  private handleFocusOut() {
+    this.hasFocus = false;
+    this.animateInstance.stopAnimations();
+  }
+
   protected render() {
     return html`
       <div 
@@ -62,8 +91,8 @@ export default class InteractionElement extends LitElement {
         aria-label=${this.alt ?? ''}
         tabindex="0"
         @mousedown=${this.handleMouseDown}
-        @focusin=${() => this.animateInstance.restartAnimation()}
-        @focusout=${() => this.animateInstance.stopAnimations()}
+        @focusin=${this.handleFocusIn}
+        @focusout=${this.handleFocusOut}
       >
         ${until(this.svg, html`<sl-spinner id="loader"></sl-spinner>`)}
       </div>

@@ -6,10 +6,16 @@ export default [
   css`
     sl-dialog::part(title) {
       font-size: var(--sl-font-size-2x-large);
+      color: var(--sl-color-primary-600);
     }
     
-    sl-dialog::part(title) {
-      color: var(--sl-color-primary-600);
+    sl-dialog::part(body) {
+      padding-top: 0;
+    }
+    
+    ul {
+      padding-inline-start: 0;
+      list-style: none;
     }
   `
 ]

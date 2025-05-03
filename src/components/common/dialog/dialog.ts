@@ -1,5 +1,8 @@
 import { LitElement, html} from "lit";
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { customElement, state } from 'lit/decorators.js';
+import { toHTML } from '@portabletext/to-html';
+
 import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
 import '@shoelace-style/shoelace/dist/components/button/button.js';
 import styles from './dialog.styles.js';
@@ -20,7 +23,7 @@ export default class Dialog extends LitElement {
   /** Public method to open the dialog */
   public open({ title, description }: any) {
     this._label = title;
-    this._content = description;
+    this._content = toHTML(description);
     this._open = true;
   }
 
@@ -38,7 +41,7 @@ export default class Dialog extends LitElement {
         ?open=${this._open}
         @sl-hide=${this.close}
       >
-        <div>${this._content}</div>
+        <div id="content">${unsafeHTML(this._content)}</div>
         <sl-button slot="footer" variant="primary" outline @click=${this.close}>Close</sl-button>
       </sl-dialog>
     `;

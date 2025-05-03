@@ -5,9 +5,9 @@ export default css`
   :host {
     position: relative;
     box-sizing: border-box; 
-    font-family: 'Poppins', sans-serif;
+    font-family: system-ui;
     font-weight: var(--sl-font-weight-normal);
-    font-size: var(--sl-font-size-x-large);
+    font-size: var(--sl-font-size-large);
     line-height: var(--sl-line-height-normal);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
