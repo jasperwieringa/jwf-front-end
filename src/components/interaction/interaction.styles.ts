@@ -5,53 +5,77 @@ import componentStyles from '../../styles/component.styles.js';
 export default [
   componentStyles,
   css`
-    #main {
+    #desktop {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(2, auto);
+
+      /* Assign specific positions */
+      .top-left {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .top-right {
+        grid-column: 3;
+        grid-row: 1;
+      }
+
+      .center {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+      }
+
+      .bottom-left {
+        grid-column: 1;
+        grid-row: 2;
+      }
+
+      .bottom-right {
+        grid-column: 3;
+        grid-row: 2;
+
+        .wrapper {
+          display: grid;
+          height: 100%;
+          width: 100%;
+        }
+      }
     }
     
-    #main > div {
+    #desktop > div {
       display: flex;
       justify-content: center;
       align-items: center;
     }
     
-    jwf-image {
-      height: fit-content;
-      width: fit-content;
-      cursor: pointer;
-    }
+    #mobile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sl-spacing-x-large);
+      height: 100svh;
+      width: 100%;
 
-    /* Assign specific positions */
-    .top-left {
-      grid-column: 1;
-      grid-row: 1;
-    }
+      #timeAndDate {
+        width: 100%;
+        text-align: center;
 
-    .top-right {
-      grid-column: 3;
-      grid-row: 1;
-    }
+        .time {
+          font-size: var(--sl-font-size-4x-large);
+          margin: var(--sl-spacing-x-large) 0 0 0;
+        }
 
-    .center {
-      grid-column: 2;
-      grid-row: 1 / span 2;
-    }
+        .date {
+          font-size: var(--sl-font-size-medium);
+          margin: 0;
+        }
+      }
 
-    .bottom-left {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
-    .bottom-right {
-      grid-column: 3;
-      grid-row: 2;
-      
-      .wrapper {
-        display: grid;
+      #content {
         height: 100%;
         width: 100%;
+        padding: var(--sl-spacing-x-large);
       }
     }
   `

@@ -8,6 +8,7 @@ import { translate as t } from 'lit-i18n';
 import { consume } from '@lit/context';
 import '@shoelace-style/shoelace/dist/components/alert/alert.js';
 import '@shoelace-style/shoelace/dist/components/icon/icon.js';
+import '@shoelace-style/shoelace/dist/components/format-date/format-date.js';
 import {
   type JwfClient,
   clientContext,
@@ -19,7 +20,6 @@ import { InteractionElement } from '../../types/pages/InteractionElement.js';
 import { PositionGroup } from '../../types/Image.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
 import './interaction-element/interaction-element.js';
-import './mobile/mobile.js';
 import styles from './interaction.styles.js';
 
 /**
@@ -27,9 +27,17 @@ import styles from './interaction.styles.js';
  */
 @customElement('jwf-interaction')
 export default class JwfInteraction extends LitElement {
+  private timerId: number | undefined;
+
   @consume({ context: clientContext })
   @property({ attribute: false })
   public client!: JwfClient;
+
+  @state()
+  private currentDate: Date = new Date();
+
+  @state()
+  private ungroupedInteractions: InteractionElement[] = [];
 
   @state()
   private interactionsByPosition: Map<PositionGroup, InteractionElement[]> = new Map();
@@ -42,11 +50,23 @@ export default class JwfInteraction extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
+    // Update the timer every second
+    this.timerId = window.setInterval(() => {
+      this.currentDate = new Date();
+    }, 1000);
+
     // Query the images
     this.client.query(API_QUERIES.interactions)
       .then(results => this.groupInteractions(results))
       .catch(() => this.hasError = true)
       .finally(() => emit(this, JWF_EVENTS.JWF_LOADED));
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    if (this.timerId) {
+      clearInterval(this.timerId);
+    }
   }
 
   /** Method that groups interactions by their provided positionGroup. */
@@ -59,7 +79,10 @@ export default class JwfInteraction extends LitElement {
       }
       grouped.get(position)!.push(element);
     });
+
+    // Store the grouped and ungrouped interactions
     this.interactionsByPosition = grouped;
+    this.ungroupedInteractions = interactions;
   }
 
   /** Method that renders the element to interact with. */
@@ -82,9 +105,9 @@ export default class JwfInteraction extends LitElement {
   }
 
   /** Iterate through all positions and place interactionElements. */
-  private renderGridElements() {
+  private renderDesktop() {
     return html`
-      <div id="main">
+      <div id="desktop">
         ${repeat([...this.interactionsByPosition.keys()], (key) => {
           const elements = repeat(this.interactionsByPosition.get(key)!, (item) => this.renderInteractionElement(item));
           
@@ -92,12 +115,29 @@ export default class JwfInteraction extends LitElement {
             <div class=${key}>
               ${when(key === 'bottom-right', () => html`
                 <div class="wrapper">${elements}</div>
-              `, () => html`${elements}`)}
+              `, () => elements)}
             </div>
           `
         })}
       </div>
     `;
+  }
+
+  /** Iterate through all positions and place interactionElements. */
+  private renderMobile() {
+    return html`
+      <div id="mobile">
+        <div id="timeAndDate">
+          <p class="time">
+            <sl-format-date date=${this.currentDate} hour="numeric" minute="numeric" hour-format="24"></sl-format-date>
+          </p>
+          <p class="date">
+            <sl-format-date date=${this.currentDate} month="long"  weekday="long" day="numeric"></sl-format-date>
+          </p>
+        </div>
+        <div id="content"></div>
+      </div>
+    `
   }
 
   /** When the client fails, display an error. */
@@ -114,13 +154,13 @@ export default class JwfInteraction extends LitElement {
   }
 
   protected render() {
-    return when(!isMobile(),
-      () => when(this.interactionsByPosition.size > 0 && !this.hasError,
-        () => this.renderGridElements(),
-        () => this.renderError()
-      ), () => html`
-        <jwf-mobile></jwf-mobile>
-      `)
+    return when(this.interactionsByPosition.size > 0 && !this.hasError,
+      () => when(!isMobile(),
+        () => this.renderDesktop(),
+        () => this.renderMobile()
+      ),
+      () => this.renderError()
+    )
   }
 }
 

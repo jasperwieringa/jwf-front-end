@@ -17,7 +17,7 @@ export default [
     }
 
     jwf-interaction {
-      height: 100%;
+      height: 100svh;
       display: grid;
     }
 
