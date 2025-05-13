@@ -4,11 +4,6 @@ import componentStyles from '../../../styles/component.styles.ts';
 export default [
   componentStyles,
   css`
-    :host {
-      justify-self: center;
-      align-self: center;
-    }
-    
     /* Container styles */
     .container {
       color: var(--sl-color-neutral-1000);
@@ -17,23 +12,28 @@ export default [
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 400px;
-      width: 210px;
+      height: 100%;
+      width: 100%;
       border: 4px solid black;
       border-radius: 1rem;
       background: rgba(255, 255, 255, 0.13);
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
+    
+    #timeAndDate {
+      text-align: center;
 
-    .time {
-      font-size: 2.5rem;
-      margin: 1.5rem 0 -12px;
+      .time {
+        font-size: var(--sl-font-size-4x-large);
+        margin: var(--sl-spacing-x-large) 0 0 0;
+      }
+  
+      .date {
+        font-size: var(--sl-font-size-medium);
+        margin: 0;
+      }
     }
-
-    .date {
-      font-size: 12px;
-    }
-
+    
     .fingerprint {
       position: absolute;
       bottom: 3rem;

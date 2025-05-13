@@ -119,7 +119,7 @@ export default class JwfInteraction extends LitElement {
         () => this.renderGridElements(),
         () => this.renderError()
       ), () => html`
-        <jwf-mobile .container=${this}></jwf-mobile>
+        <jwf-mobile></jwf-mobile>
       `)
   }
 }
