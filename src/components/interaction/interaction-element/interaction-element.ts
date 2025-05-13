@@ -1,5 +1,6 @@
 import { html, LitElement, TemplateResult } from 'lit';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { until } from 'lit/directives/until.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -26,6 +27,9 @@ export default class InteractionElement extends LitElement {
 
   @property({ type: Object })
   public interactionElement!: InteractionElementType
+
+  @property({ type: Boolean })
+  public mobile: boolean = false;
 
   /** @internal */
   @state()
@@ -54,11 +58,29 @@ export default class InteractionElement extends LitElement {
     window.removeEventListener('mouseup', this.handleMouseUp.bind(this));
   }
 
+  // Example override function
+  private _processSvg(svgString: string): string {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgString, 'image/svg+xml');
+    const svgEl = doc.documentElement;
+
+    // Set or overwrite width/height
+    svgEl.setAttribute('width', '100');
+    svgEl.setAttribute('height', '100');
+
+    return new XMLSerializer().serializeToString(svgEl);
+  }
+
   // Load the image and handle the response
   private _loadImage(url: string) {
     fetch(url)
       .then(res => res.text())
-      .then(svg => this.svg = html`${unsafeSVG(svg)}`);
+      .then(rawSvg => {
+        this.svg = html`${unsafeSVG(this.mobile 
+          ? this._processSvg(rawSvg) 
+          : rawSvg)
+        }`;
+      });
   }
 
   private handleMouseDown(e: MouseEvent) {
@@ -104,6 +126,9 @@ export default class InteractionElement extends LitElement {
     return html`
       <div 
         id="main" 
+        class=${classMap({
+          mobile: this.mobile
+        })}
         role="img" 
         aria-label=${ifDefined(alt || undefined)}
         tabindex=${tabIndex ?? 0}

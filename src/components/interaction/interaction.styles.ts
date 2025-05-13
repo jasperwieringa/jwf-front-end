@@ -1,6 +1,5 @@
 import { css } from 'lit';
 import componentStyles from '../../styles/component.styles.js';
-// import { mobileBreakpoint, tabletBreakpoint } from '../../styles/constants/constants.js';
 
 export default [
   componentStyles,
@@ -9,6 +8,12 @@ export default [
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(2, auto);
+      
+      > div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
       /* Assign specific positions */
       .top-left {
@@ -41,19 +46,14 @@ export default [
           width: 100%;
         }
       }
-    }
-    
-    #desktop > div {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      
     }
     
     #mobile {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--sl-spacing-x-large);
+      gap: var(--sl-spacing-3x-large);
       height: 100svh;
       width: 100%;
 
@@ -75,7 +75,11 @@ export default [
       #content {
         height: 100%;
         width: 100%;
-        padding: var(--sl-spacing-x-large);
+        padding: var(--sl-spacing-large);
+        display: grid;
+        grid-auto-rows: max-content;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--sl-spacing-medium);
       }
     }
   `

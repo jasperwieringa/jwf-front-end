@@ -6,8 +6,21 @@ export default [
   css`
     :host {
       display: inline-flex;
+      height: fit-content;
       justify-content: center;
       --filter: drop-shadow(0 0 10px rgb(244, 157, 55));
+    }
+    
+    #main.mobile {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+      svg {
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.13);
+        border-radius: var(--sl-border-radius-large);
+      }
     }
 
     #main:focus-visible {

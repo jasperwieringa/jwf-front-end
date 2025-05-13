@@ -15,7 +15,8 @@ import {
 } from '../../services/client-context.js';
 import { emit } from '../../utilities/event.js';
 import { JWF_EVENTS } from '../../utilities/constants/events.js';
-import { isMobile } from '../../utilities/mobile.ts';
+import { hasItems } from "../../utilities/hasItems.js";
+import { isMobile } from '../../utilities/mobile.js';
 import { InteractionElement } from '../../types/pages/InteractionElement.js';
 import { PositionGroup } from '../../types/Image.js';
 import { API_QUERIES } from '../../services/apiQueries.js';
@@ -37,10 +38,7 @@ export default class JwfInteraction extends LitElement {
   private currentDate: Date = new Date();
 
   @state()
-  private ungroupedInteractions: InteractionElement[] = [];
-
-  @state()
-  private interactionsByPosition: Map<PositionGroup, InteractionElement[]> = new Map();
+  private interactions: InteractionElement[] = [];
 
   @state()
   private hasError: boolean = false;
@@ -57,7 +55,9 @@ export default class JwfInteraction extends LitElement {
 
     // Query the images
     this.client.query(API_QUERIES.interactions)
-      .then(results => this.groupInteractions(results))
+      .then(results => {
+        this.interactions = results;
+      })
       .catch(() => this.hasError = true)
       .finally(() => emit(this, JWF_EVENTS.JWF_LOADED));
   }
@@ -79,14 +79,11 @@ export default class JwfInteraction extends LitElement {
       }
       grouped.get(position)!.push(element);
     });
-
-    // Store the grouped and ungrouped interactions
-    this.interactionsByPosition = grouped;
-    this.ungroupedInteractions = interactions;
+    return grouped;
   }
 
-  /** Method that renders the element to interact with. */
-  private renderInteractionElement(item: InteractionElement) {
+  /** Method that renders the elements to interact with for desktop. */
+  private renderDesktopInteractions(item: InteractionElement) {
     const { image, _id } = item;
     const { gridIndex, rowIndex } = image;
 
@@ -106,11 +103,14 @@ export default class JwfInteraction extends LitElement {
 
   /** Iterate through all positions and place interactionElements. */
   private renderDesktop() {
+    const interactionsByPosition = this.groupInteractions(this.interactions);
+
     return html`
       <div id="desktop">
-        ${repeat([...this.interactionsByPosition.keys()], (key) => {
-          const elements = repeat(this.interactionsByPosition.get(key)!, (item) => this.renderInteractionElement(item));
-          
+        ${repeat([...interactionsByPosition.keys()], (key) => {
+          const elements = repeat(interactionsByPosition.get(key)!, (item) => this.renderDesktopInteractions(item));
+
+          // Wrap the elements in the bottom-right
           return html`
             <div class=${key}>
               ${when(key === 'bottom-right', () => html`
@@ -135,7 +135,16 @@ export default class JwfInteraction extends LitElement {
             <sl-format-date date=${this.currentDate} month="long"  weekday="long" day="numeric"></sl-format-date>
           </p>
         </div>
-        <div id="content"></div>
+        <div id="content">
+          ${repeat(this.interactions, item => item._id, item => html`
+            <jwf-interaction-element
+              id=${ifDefined(item._id)}
+              .container=${this}
+              .interactionElement=${item}
+              mobile
+            ></jwf-interaction-element>
+          `)}
+        </div>
       </div>
     `
   }
@@ -154,7 +163,7 @@ export default class JwfInteraction extends LitElement {
   }
 
   protected render() {
-    return when(this.interactionsByPosition.size > 0 && !this.hasError,
+    return when(hasItems(this.interactions) && !this.hasError,
       () => when(!isMobile(),
         () => this.renderDesktop(),
         () => this.renderMobile()
